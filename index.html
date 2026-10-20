@@ -53,6 +53,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .tr.w i{background:var(--wr)}.br span:last-child{text-align:right}
 .lbl{cursor:pointer;border:1px solid var(--br);border-radius:8px;padding:8px 10px;background:var(--card)}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="w">
@@ -62,7 +63,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 <div id="v1">
 <div class="cards" id="kpi"></div>
 <div class="c sec">
-<div class="hd"><h2>🔔 Pengingat Pembayaran</h2><label style="font-size:13px;color:var(--mu)">Tampilkan jatuh tempo dalam <select id="rw"><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="14">14 hari</option><option value="30">30 hari</option></select></label></div>
+<div class="hd"><h2>🔔 Pengingat Pembayaran</h2><label style="font-size:13px;color:var(--mu)">Tampilkan jatuh tempo dalam <select id="rw"><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="14">14 hari</option><option value="30">30 hari</option></select></label><button class="p" id="qb">📨 Ingatkan semua</button></div>
 <div id="rem"></div>
 </div>
 <div class="c sec"><h2>Proyeksi angsuran masuk (6 bulan ke depan)</h2><div id="chart"></div></div>
@@ -74,7 +75,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 <input id="q" placeholder="Cari nama / keterangan…">
 <select id="st"><option value="all">Semua</option><option value="aktif">Berjalan</option><option value="lunas">Lunas</option></select>
 <button class="p" id="add">+ Tambah</button>
-<button id="csv">Ekspor CSV</button><button id="csv2">Ekspor Riwayat Bayar</button><button id="bk">Cadangan JSON</button><label class="lbl">Impor JSON<input id="imp" type="file" accept=".json" hidden></label>
+<button class="p" id="xl">📥 Ekspor Excel</button><button id="csv">Ekspor CSV</button><button id="csv2">Ekspor Riwayat Bayar</button><button id="bk">Cadangan JSON</button><label class="lbl">Impor JSON<input id="imp" type="file" accept=".json" hidden></label>
 </div>
 <div class="tw"><table>
 <thead><tr><th>User</th><th>Keterangan</th><th>Tgl Kredit</th><th>DP</th><th>Angsuran</th><th>Bulan</th><th>Total</th><th>Modal</th><th>Untung</th><th>Kurang</th><th>Sisa Tagihan</th><th>Jatuh Tempo</th><th>Progres</th><th style="position:sticky;right:0">Aksi</th></tr></thead>
@@ -84,12 +85,17 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 
 <div id="v3" style="display:none">
 <div class="cards" id="sk"></div>
-<div class="bar"><button onclick="$('csv').click()">Ekspor CSV</button><button onclick="$('csv2').click()">Ekspor Riwayat Bayar</button></div>
+<div class="bar"><button class="p" onclick="$('xl').click()">📥 Ekspor Excel</button><button onclick="$('csv').click()">Ekspor CSV</button><button onclick="$('csv2').click()">Ekspor Riwayat Bayar</button></div>
 <div class="tw"><table style="min-width:900px"><thead><tr><th>User</th><th>Keterangan</th><th>Total Pinjaman</th><th>Sudah Dibayar</th><th>Sisa Pinjaman</th><th>Sisa Bulan</th><th>Bayar Terakhir</th><th>Progres</th><th>Aksi</th></tr></thead><tbody id="tb3"></tbody><tfoot id="tf3"></tfoot></table></div>
 </div>
 </div>
 
 <div id="lg" style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px"><div class="c" style="width:min(360px,100%)"><h2>🔐 Masuk</h2><div class="f"><label>Email</label><input id="le" type="email"></div><div class="f"><label>Password</label><input id="lp" type="password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button></div></div>
+<dialog id="qd" style="width:min(460px,94vw)">
+<div class="hd"><h3 id="qh" style="margin:0"></h3><button id="qx">Tutup</button></div>
+<div id="qc"></div>
+</dialog>
+
 <dialog id="rd" style="width:min(520px,94vw)">
 <h3 id="rt" style="margin-top:0"></h3><div id="rb"></div>
 <div style="text-align:right;margin-top:10px"><button id="rc">Tutup</button></div>
@@ -116,13 +122,14 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 </div>
 <div class="f"><label>Sisa bulan (kurang)</label><input id="fs" type="number" min="0"></div>
 <div class="f"><label>Modal (Rp) — harga beli barang</label><input id="fm" type="number" min="0"></div>
+<div class="f"><label style="display:flex;gap:8px;align-items:center"><input id="ftd" type="checkbox"> Hanya penanda (dana belum cair, tidak dihitung)</label></div>
 <div class="pv" id="pv"></div>
 <div style="display:flex;gap:8px;justify-content:flex-end"><button id="cx">Batal</button><button class="p" id="sv">Simpan</button></div>
 </dialog>
 
 <script>
 var KEY="kredit_v1",data=[],editId=null;
-var seed=[{"id":1001,"nama":"Invest NDARU","ket":"","hp":"","tgl":"2026-07-05","dp":40000000,"modal":0,"angs":3500000,"bulan":12,"sisa":12,"bayar":[]},{"id":1002,"nama":"dado","ket":"ip 16 promax 512 new","hp":"","tgl":"2025-12-04","dp":0,"modal":0,"angs":2500000,"bulan":12,"sisa":2,"bayar":[]},{"id":1003,"nama":"Savio","ket":"Ip 14 pro 128","hp":"","tgl":"2025-12-18","dp":0,"modal":0,"angs":550000,"bulan":12,"sisa":4,"bayar":[]},{"id":1004,"nama":"Bu Mei","ket":"tab infinix","hp":"","tgl":"2026-03-21","dp":0,"modal":0,"angs":395000,"bulan":10,"sisa":3,"bayar":[]},{"id":1005,"nama":"Ossy","ket":"Iphone 13 pro 512","hp":"","tgl":"2026-04-05","dp":0,"modal":0,"angs":200000,"bulan":12,"sisa":5,"bayar":[]},{"id":1006,"nama":"Ossy","ket":"Iphone 13 pro 512","hp":"","tgl":"2026-04-05","dp":0,"modal":0,"angs":500000,"bulan":19,"sisa":19,"bayar":[]},{"id":1007,"nama":"Bayu paper","ket":"dana","hp":"","tgl":"2026-04-08","dp":0,"modal":0,"angs":1140000,"bulan":12,"sisa":6,"bayar":[]},{"id":1008,"nama":"Dita","ket":"Dana","hp":"","tgl":"2026-04-14","dp":0,"modal":0,"angs":1100000,"bulan":41,"sisa":35,"bayar":[]},{"id":1009,"nama":"Dadang","ket":"Dana","hp":"","tgl":"2026-04-26","dp":0,"modal":0,"angs":1350000,"bulan":18,"sisa":13,"bayar":[]},{"id":1010,"nama":"Betsey","ket":"TV 32 inch smart","hp":"","tgl":"2026-04-23","dp":0,"modal":0,"angs":322000,"bulan":6,"sisa":2,"bayar":[]},{"id":1011,"nama":"savio","ket":"sepeda mtb","hp":"","tgl":"2026-04-24","dp":0,"modal":0,"angs":1000000,"bulan":9,"sisa":4,"bayar":[]},{"id":1012,"nama":"Legis","ket":"Motor Mega 250","hp":"","tgl":"2026-05-20","dp":0,"modal":0,"angs":970000,"bulan":18,"sisa":14,"bayar":[]},{"id":1013,"nama":"Gilang","ket":"infinix note edge","hp":"","tgl":"2026-05-31","dp":0,"modal":0,"angs":528000,"bulan":7,"sisa":3,"bayar":[]},{"id":1014,"nama":"Bu Agus joho","ket":"showxase","hp":"","tgl":"2026-06-02","dp":0,"modal":0,"angs":695000,"bulan":5,"sisa":1,"bayar":[]},{"id":1015,"nama":"Joko","ket":"kulkas","hp":"","tgl":"2026-06-07","dp":0,"modal":0,"angs":390000,"bulan":6,"sisa":3,"bayar":[]},{"id":1016,"nama":"Dandy brengos","ket":"IPHONE 15 129 ALLOP","hp":"","tgl":"2026-06-23","dp":0,"modal":0,"angs":750000,"bulan":12,"sisa":9,"bayar":[]},{"id":1017,"nama":"Roni","ket":"dana 40 jt","hp":"","tgl":"2026-06-27","dp":0,"modal":0,"angs":3800000,"bulan":15,"sisa":12,"bayar":[]},{"id":1018,"nama":"Koyor","ket":"tab","hp":"","tgl":"2026-06-27","dp":0,"modal":0,"angs":575000,"bulan":6,"sisa":3,"bayar":[]},{"id":1019,"nama":"Bea lie","ket":"Ip 13 128 ibox","hp":"","tgl":"2026-07-04","dp":0,"modal":0,"angs":1230000,"bulan":5,"sisa":3,"bayar":[]},{"id":1020,"nama":"Dita","ket":"Sofa","hp":"","tgl":"2026-07-04","dp":0,"modal":0,"angs":115000,"bulan":12,"sisa":9,"bayar":[]},{"id":1021,"nama":"Nanda","ket":"sepeda Listrik","hp":"","tgl":"2026-07-08","dp":0,"modal":0,"angs":553000,"bulan":7,"sisa":5,"bayar":[]},{"id":1022,"nama":"Frans","ket":"Dana 8 jt","hp":"","tgl":"2026-07-12","dp":0,"modal":0,"angs":500000,"bulan":34,"sisa":32,"bayar":[]},{"id":1023,"nama":"Agung","ket":"Dana 3 jt","hp":"","tgl":"2026-07-16","dp":0,"modal":0,"angs":620000,"bulan":6,"sisa":4,"bayar":[]},{"id":1024,"nama":"Tama","ket":"Iphone 13 128 ibox","hp":"","tgl":"2026-07-15","dp":0,"modal":0,"angs":140000,"bulan":12,"sisa":10,"bayar":[]},{"id":1025,"nama":"Ivana","ket":"redmi pad 2","hp":"","tgl":"2026-07-22","dp":0,"modal":0,"angs":420000,"bulan":7,"sisa":4,"bayar":[]},{"id":1026,"nama":"Enos","ket":"mobil datsun","hp":"","tgl":"2026-08-10","dp":0,"modal":0,"angs":3500000,"bulan":28,"sisa":26,"bayar":[]},{"id":1027,"nama":"Topan","ket":"Samsung A55","hp":"","tgl":"2026-08-05","dp":0,"modal":0,"angs":635000,"bulan":6,"sisa":4,"bayar":[]},{"id":1028,"nama":"Erik pendeta","ket":"Hp infinix note 40 8/256","hp":"","tgl":"2026-08-10","dp":0,"modal":0,"angs":760000,"bulan":4,"sisa":3,"bayar":[]},{"id":1029,"nama":"Rosa","ket":"dana 1.5","hp":"","tgl":"2026-08-25","dp":0,"modal":0,"angs":545000,"bulan":3,"sisa":1,"bayar":[]},{"id":1030,"nama":"Ibnu","ket":"dana","hp":"","tgl":"2026-09-03","dp":0,"modal":0,"angs":860000,"bulan":6,"sisa":5,"bayar":[]},{"id":1031,"nama":"Om Eko","ket":"Laptop lenovo X1 8/256","hp":"","tgl":"2026-09-06","dp":0,"modal":0,"angs":490000,"bulan":13,"sisa":12,"bayar":[]},{"id":1032,"nama":"Samuel Kurios","ket":"dana 4jt","hp":"","tgl":"2026-09-09","dp":0,"modal":0,"angs":2280000,"bulan":2,"sisa":1,"bayar":[]},{"id":1033,"nama":"Viktor","ket":"Laptop hype 5","hp":"","tgl":"2026-09-09","dp":0,"modal":0,"angs":640000,"bulan":11,"sisa":11,"bayar":[]},{"id":1034,"nama":"joshua","ket":"Laptop T470","hp":"","tgl":"2026-09-10","dp":0,"modal":0,"angs":485000,"bulan":7,"sisa":7,"bayar":[]},{"id":1035,"nama":"Bagas","ket":"Printer","hp":"","tgl":"2026-09-25","dp":0,"modal":0,"angs":1230000,"bulan":4,"sisa":4,"bayar":[]},{"id":1036,"nama":"Wawan","ket":"BB Blowback","hp":"","tgl":"2026-09-26","dp":0,"modal":0,"angs":720000,"bulan":4,"sisa":4,"bayar":[]},{"id":1037,"nama":"Savio","ket":"Gmpas sepeda","hp":"","tgl":"2026-10-03","dp":0,"modal":0,"angs":600000,"bulan":6,"sisa":6,"bayar":[]},{"id":1038,"nama":"joy","ket":"dana 2jt","hp":"","tgl":"2026-10-04","dp":0,"modal":0,"angs":766000,"bulan":3,"sisa":3,"bayar":[]},{"id":1039,"nama":"bagas minki","ket":"dana 35 juta service mesin","hp":"","tgl":"2026-10-07","dp":0,"modal":0,"angs":2500000,"bulan":24,"sisa":24,"bayar":[]}];
+var seed=[{"id":1040,"nama":"hapsari","ket":"ip 15 pro second","hp":"","tgl":"2025-11-30","dp":0,"modal":0,"angs":1450000,"bulan":12,"sisa":2,"bayar":["2025-12-31","2026-01-31","2026-03-01","2026-04-01","2026-04-30","2026-05-29","2026-06-30","2026-07-31","2026-08-29","2026-09-29"]},{"id":1001,"nama":"Invest NDARU","ket":"","hp":"","tgl":"2026-07-05","dp":40000000,"modal":0,"angs":3500000,"bulan":12,"sisa":12,"bayar":[],"tanda":true},{"id":1002,"nama":"dado","ket":"ip 16 promax 512 new","hp":"","tgl":"2025-12-04","dp":0,"modal":0,"angs":2500000,"bulan":12,"sisa":2,"bayar":["2026-01-04","2026-02-04","2026-03-04","2026-04-05","2026-05-04","2026-06-04","2026-07-04","2026-08-04","2026-09-04","2026-10-04"]},{"id":1003,"nama":"Savio","ket":"Ip 14 pro 128","hp":"","tgl":"2025-12-18","dp":0,"modal":0,"angs":550000,"bulan":12,"sisa":3,"bayar":["2026-01-31","2026-03-01","2026-03-28","2026-04-27","2026-05-27","2026-06-27","2026-07-31","2026-08-30","2026-09-27"]},{"id":1004,"nama":"Bu Mei","ket":"tab infinix","hp":"","tgl":"2026-03-21","dp":0,"modal":0,"angs":395000,"bulan":10,"sisa":3,"bayar":["2026-04-01","2026-05-01","2026-05-21","2026-07-01","2026-08-01","2026-08-31","2026-10-01"]},{"id":1005,"nama":"Ossy","ket":"Iphone 13 pro 512","hp":"","tgl":"2026-04-05","dp":0,"modal":0,"angs":200000,"bulan":12,"sisa":5,"bayar":["2026-05-05","2026-06-05","2026-07-05","2026-08-05","2026-09-05","2026-10-05",""]},{"id":1006,"nama":"Ossy","ket":"Iphone 13 pro 512","hp":"","tgl":"2027-04-05","dp":0,"modal":0,"angs":500000,"bulan":19,"sisa":19,"bayar":[]},{"id":1007,"nama":"Bayu paper","ket":"dana","hp":"","tgl":"2026-04-08","dp":0,"modal":0,"angs":1140000,"bulan":12,"sisa":6,"bayar":["2026-04-30","2026-05-31","2026-07-01","2026-07-31","2026-08-31","2026-09-30"]},{"id":1008,"nama":"Dita","ket":"Dana","hp":"","tgl":"2026-04-14","dp":0,"modal":0,"angs":1100000,"bulan":41,"sisa":35,"bayar":["2026-05-06","2026-06-06","2026-07-07","2026-08-07","2026-09-07","2026-10-07"]},{"id":1009,"nama":"Dadang","ket":"Dana","hp":"","tgl":"2026-04-26","dp":0,"modal":0,"angs":1350000,"bulan":18,"sisa":13,"bayar":["2026-05-29","2026-06-30","2026-07-31","2026-08-29","2026-09-29"]},{"id":1010,"nama":"Betsey","ket":"TV 32 inch smart","hp":"","tgl":"2026-04-23","dp":0,"modal":0,"angs":322000,"bulan":6,"sisa":2,"bayar":["2026-05-31","2026-07-03","2026-08-03","2026-09-14"]},{"id":1011,"nama":"savio","ket":"sepeda mtb","hp":"","tgl":"2026-04-24","dp":0,"modal":0,"angs":1000000,"bulan":9,"sisa":4,"bayar":["2026-05-27","2026-06-27","2026-07-29","2026-08-29","2026-09-27"]},{"id":1012,"nama":"Legis","ket":"Motor Mega 250","hp":"","tgl":"2026-05-20","dp":0,"modal":0,"angs":970000,"bulan":18,"sisa":14,"bayar":["2026-06-21","2026-07-21","2026-08-22","2026-09-22"]},{"id":1013,"nama":"Gilang","ket":"infinix note edge","hp":"","tgl":"2026-05-31","dp":0,"modal":0,"angs":528000,"bulan":7,"sisa":3,"bayar":["2026-06-30","2026-07-29","2026-08-30","2026-09-29"]},{"id":1014,"nama":"Bu Agus joho","ket":"showxase","hp":"","tgl":"2026-06-02","dp":0,"modal":0,"angs":695000,"bulan":5,"sisa":1,"bayar":["2026-07-02","2026-08-03","2026-09-03","2026-10-02"]},{"id":1015,"nama":"Joko","ket":"kulkas","hp":"","tgl":"2026-06-07","dp":0,"modal":0,"angs":390000,"bulan":6,"sisa":3,"bayar":["2026-08-01","2026-09-05","2026-09-29"]},{"id":1016,"nama":"Dandy brengos","ket":"IPHONE 15 129 ALLOP","hp":"","tgl":"2026-06-23","dp":0,"modal":0,"angs":750000,"bulan":12,"sisa":9,"bayar":["2026-07-28","2026-09-05","2026-10-06"]},{"id":1017,"nama":"Roni","ket":"dana 40 jt","hp":"","tgl":"2026-06-27","dp":0,"modal":0,"angs":3800000,"bulan":15,"sisa":12,"bayar":["2026-08-29","2026-08-29","2026-09-29"]},{"id":1018,"nama":"Koyor","ket":"tab","hp":"","tgl":"2026-06-27","dp":0,"modal":0,"angs":575000,"bulan":6,"sisa":3,"bayar":["2026-08-01","2026-09-07","2026-10-08"]},{"id":1019,"nama":"Bea lie","ket":"Ip 13 128 ibox","hp":"","tgl":"2026-07-04","dp":0,"modal":0,"angs":1230000,"bulan":5,"sisa":2,"bayar":["2026-08-03","2026-09-03","2026-10-04"]},{"id":1020,"nama":"Dita","ket":"Sofa","hp":"","tgl":"2026-07-04","dp":0,"modal":0,"angs":115000,"bulan":12,"sisa":9,"bayar":["2026-08-07","2026-09-08","2026-10-07"]},{"id":1021,"nama":"Nanda","ket":"sepeda Listrik","hp":"","tgl":"2026-07-08","dp":0,"modal":0,"angs":553000,"bulan":7,"sisa":4,"bayar":["2026-08-08","2026-09-10","2026-10-13"]},{"id":1022,"nama":"Frans","ket":"Dana 8 jt","hp":"","tgl":"2026-07-12","dp":0,"modal":0,"angs":500000,"bulan":34,"sisa":32,"bayar":["2026-08-29","2026-09-29"]},{"id":1023,"nama":"Agung","ket":"Dana 3 jt","hp":"","tgl":"2026-07-16","dp":0,"modal":0,"angs":620000,"bulan":6,"sisa":4,"bayar":["2026-08-21","2026-09-22"]},{"id":1024,"nama":"Tama","ket":"Iphone 13 128 ibox","hp":"","tgl":"2026-07-15","dp":0,"modal":0,"angs":140000,"bulan":12,"sisa":9,"bayar":["2026-08-15","2026-09-15","2026-10-15"]},{"id":1025,"nama":"Ivana","ket":"redmi pad 2","hp":"","tgl":"2026-07-22","dp":0,"modal":0,"angs":420000,"bulan":7,"sisa":4,"bayar":["2026-07-31","2026-08-31","2026-09-30"]},{"id":1026,"nama":"Enos","ket":"mobil datsun","hp":"","tgl":"2026-08-10","dp":0,"modal":0,"angs":3500000,"bulan":28,"sisa":26,"bayar":["2026-09-10","2026-10-10"]},{"id":1027,"nama":"Topan","ket":"Samsung A55","hp":"","tgl":"2026-08-05","dp":0,"modal":0,"angs":635000,"bulan":6,"sisa":4,"bayar":["2026-09-05","2026-10-05"]},{"id":1028,"nama":"Erik pendeta","ket":"Hp infinix note 40 8/256","hp":"","tgl":"2026-08-10","dp":0,"modal":0,"angs":760000,"bulan":4,"sisa":3,"bayar":["2026-09-10"]},{"id":1029,"nama":"Rosa","ket":"dana 1.5","hp":"","tgl":"2026-08-25","dp":0,"modal":0,"angs":545000,"bulan":3,"sisa":1,"bayar":["2026-08-29","2026-09-29"]},{"id":1030,"nama":"Ibnu","ket":"dana","hp":"","tgl":"2026-09-03","dp":0,"modal":0,"angs":860000,"bulan":6,"sisa":5,"bayar":["2026-10-03"]},{"id":1031,"nama":"Om Eko","ket":"Laptop lenovo X1 8/256","hp":"","tgl":"2026-09-06","dp":0,"modal":0,"angs":490000,"bulan":13,"sisa":12,"bayar":["2026-10-11"]},{"id":1032,"nama":"Samuel Kurios","ket":"dana 4jt","hp":"","tgl":"2026-09-09","dp":0,"modal":0,"angs":2280000,"bulan":2,"sisa":1,"bayar":["2026-10-03"]},{"id":1033,"nama":"Viktor","ket":"Laptop hype 5","hp":"","tgl":"2026-09-09","dp":0,"modal":0,"angs":640000,"bulan":11,"sisa":11,"bayar":[]},{"id":1034,"nama":"joshua","ket":"Laptop T470","hp":"","tgl":"2026-09-10","dp":0,"modal":0,"angs":485000,"bulan":7,"sisa":6,"bayar":["2026-10-17"]},{"id":1035,"nama":"Bagas","ket":"Printer","hp":"","tgl":"2026-09-25","dp":0,"modal":0,"angs":1230000,"bulan":4,"sisa":4,"bayar":[]},{"id":1036,"nama":"Wawan","ket":"BB Blowback","hp":"","tgl":"2026-09-26","dp":0,"modal":0,"angs":720000,"bulan":4,"sisa":4,"bayar":[]},{"id":1037,"nama":"Savio","ket":"Gmpas sepeda","hp":"","tgl":"2026-10-03","dp":0,"modal":0,"angs":600000,"bulan":6,"sisa":6,"bayar":[]},{"id":1038,"nama":"joy","ket":"dana 2jt","hp":"","tgl":"2026-10-04","dp":0,"modal":0,"angs":766000,"bulan":3,"sisa":3,"bayar":[]},{"id":1041,"nama":"bagas minki","ket":"dana 35 juta service mesin","hp":"","tgl":"2026-10-07","dp":0,"modal":0,"angs":1000000,"bulan":24,"sisa":24,"bayar":[]},{"id":1042,"nama":"Angga showcase dan rak","ket":"3.5 jt showcase , 2850 rak","hp":"","tgl":"2026-10-10","dp":0,"modal":0,"angs":857000,"bulan":10,"sisa":10,"bayar":[]}];
 data=[];
 function save(){sync()}
 var $=function(i){return document.getElementById(i)};
@@ -131,16 +138,16 @@ var esc=function(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&
 var fmD=function(d){return d?d.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}):"-"};
 var T=new Date();T.setHours(0,0,0,0);
 function am(s,n){var d=new Date(s+"T00:00:00");if(isNaN(d))return null;var day=d.getDate(),r=new Date(d.getFullYear(),d.getMonth()+n,1),last=new Date(r.getFullYear(),r.getMonth()+1,0).getDate();r.setDate(Math.min(day,last));return r}
-function nd(x){return x.sisa>0?am(x.tgl,x.bulan-x.sisa+1):null}
+function nd(x){return x.sisa>0&&!x.tanda?am(x.tgl,x.bulan-x.sisa+1):null}
 function dd(x){var d=nd(x);return d?Math.round((d-T)/864e5):null}
-function bdg(x){if(x.sisa<=0)return'<span class="bd l">Lunas</span>';var d=dd(x);if(d===null)return"-";
+function bdg(x){if(x.tanda)return'<span class="bd">Penanda</span>';if(x.sisa<=0)return'<span class="bd l">Lunas</span>';var d=dd(x);if(d===null)return"-";
 if(d<0)return'<span class="bd late">Telat '+(-d)+' hr</span>';if(d===0)return'<span class="bd today">Hari ini</span>';
 return'<span class="bd '+(d<=7?"soon":"")+'">'+d+' hr lagi</span>'}
 function byId(id){return data.find(function(d){return d.id===id})}
 
 function dash(){
 var w=+$("rw").value,tM=0,tIn=0,tU=0,tS=0,akt=0,lun=0,late=0,ang=0,tTag=0;
-data.forEach(function(x){var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=tot-(x.modal||0);tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
+data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=tot-(x.modal||0);tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
 if(x.sisa>0){akt++;tS+=x.angs*x.sisa;ang+=x.angs;if(dd(x)<0)late++}else lun++});
 var k=[["Kredit berjalan",akt],["Lunas",lun],["Terlambat",late,late?"var(--wr)":""],["Total sisa tagihan",rp(tS)],["Angsuran / bulan",rp(ang)],["Total modal",rp(tM)],["Uang sudah masuk",rp(tIn)],["Untung bersih (proyeksi)",rp(tU)],["Untung saat ini",rp(tIn-tM),tIn-tM>=0?"var(--ok)":"var(--wr)"]];
 $("kpi").innerHTML=k.map(function(c){return '<div class=c><small>'+c[0]+'</small><b'+(c[2]?' style="color:'+c[2]+'"':'')+'>'+c[1]+'</b></div>'}).join("");
@@ -150,7 +157,7 @@ $("cnt").textContent=all?"("+all+")":"";
 $("rem").innerHTML=rem.length?rem.map(function(x){var n=x.bulan-x.sisa+1;
 return '<div class=rl><div class=i><b>'+esc(x.nama)+'</b> '+bdg(x)+'<small>'+esc(x.ket||"-")+' • angsuran ke-'+n+'/'+x.bulan+' • '+rp(x.angs)+' • jatuh tempo '+fmD(nd(x))+'</small></div><button onclick="wa('+x.id+')">💬 Ingatkan via WA</button><button class=p onclick="openP('+x.id+')">✓ Sudah bayar</button></div>'}).join(""):'<div class=em>Tidak ada tagihan jatuh tempo dalam '+w+' hari. 🎉</div>';
 var base=T.getFullYear()*12+T.getMonth(),m=[0,0,0,0,0,0],lt=0;
-data.forEach(function(x){if(x.sisa<=0)return;var p=x.bulan-x.sisa;for(var j=1;j<=x.sisa;j++){var d=am(x.tgl,p+j);if(!d)continue;var i=d.getFullYear()*12+d.getMonth()-base;if(i<0)lt+=x.angs;else if(i<6)m[i]+=x.angs}});
+data.forEach(function(x){if(x.sisa<=0||x.tanda)return;var p=x.bulan-x.sisa;for(var j=1;j<=x.sisa;j++){var d=am(x.tgl,p+j);if(!d)continue;var i=d.getFullYear()*12+d.getMonth()-base;if(i<0)lt+=x.angs;else if(i<6)m[i]+=x.angs}});
 var mx=Math.max(lt,Math.max.apply(null,m),1),h="";
 if(lt)h+='<div class=br><span>Tertunggak</span><div class="tr w"><i style="width:'+lt/mx*100+'%"></i></div><span>'+rp(lt)+'</span></div>';
 m.forEach(function(v,i){var d=new Date(T.getFullYear(),T.getMonth()+i,1);h+='<div class=br><span>'+d.toLocaleDateString("id-ID",{month:"short",year:"2-digit"})+'</span><div class=tr><i style="width:'+v/mx*100+'%"></i></div><span>'+rp(v)+'</span></div>'});
@@ -166,7 +173,7 @@ if(st==="aktif"&&x.sisa<=0)return false;
 if(st==="lunas"&&x.sisa>0)return false;return true});
 var fT=0,fS=0,fM=0,fU=0;
 $("tb").innerHTML=rows.length?rows.map(function(x){
-var tot=x.angs*x.bulan,sis=x.angs*x.sisa,un=(x.dp||0)+tot-(x.modal||0);fT+=tot;fS+=sis;fM+=x.modal||0;fU+=un;
+var tot=x.angs*x.bulan,sis=x.angs*x.sisa,un=(x.dp||0)+tot-(x.modal||0);if(!x.tanda){fT+=tot;fS+=sis;fM+=x.modal||0;fU+=un}
 var pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0;
 return "<tr><td><b>"+esc(x.nama)+"</b></td><td>"+esc(x.ket)+"</td><td>"+fmD(new Date(x.tgl+"T00:00:00"))+"</td><td class=n>"+(x.dp?rp(x.dp):"-")+"</td><td class=n>"+rp(x.angs)+"</td><td class=n>"+x.bulan+"</td><td class=n>"+rp(tot)+"</td><td class=n>"+(x.modal?rp(x.modal):"-")+"</td><td class=n style='color:var("+(un>=0?"--ok":"--wr")+")'>"+(x.modal?rp(un):"-")+"</td><td class=n>"+(x.sisa>0?x.sisa:"0")+"</td><td class=n>"+rp(sis)+"</td><td>"+(x.sisa>0?fmD(nd(x))+"<br>":"")+bdg(x)+"</td><td><div class=pg title='"+pct+"%'><i style='width:"+pct+"%'></i></div></td><td class=a><button class=p onclick='openP("+x.id+")' title='Catat pembayaran'>✓ Bayar</button><button onclick='unpay("+x.id+")' title='Batalkan pembayaran terakhir'>↩</button><button onclick='wa("+x.id+")' title='Ingatkan via WhatsApp'>💬</button><button onclick='edit("+x.id+")'>Edit</button><button class=d onclick='del("+x.id+")'>Hapus</button></td></tr>"}).join(""):"<tr><td colspan=14 class=em>Belum ada data.</td></tr>";
 $("tf").innerHTML=rows.length?"<tr><td colspan=6>Total ("+rows.length+" data)</td><td class=n>"+rp(fT)+"</td><td class=n>"+rp(fM)+"</td><td class=n>"+rp(fU)+"</td><td></td><td class=n>"+rp(fS)+"</td><td colspan=3></td></tr>":"";
@@ -186,12 +193,52 @@ function iso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+
 function hist(x){var p=x.bulan-x.sisa,b=(x.bayar||[]).slice(-Math.max(p,1));if(p<=0)b=[];var s=p-b.length,r=[];for(var k=0;k<p;k++)r.push(k>=s?b[k-s]:'');return r}
 function dT(s){return s?fmD(new Date(s+'T00:00:00')):'tidak tercatat'}
 function table3(){var tI=0,tS=0,n=0;
-$('tb3').innerHTML=data.map(function(x){var tot=x.angs*x.bulan,sis=x.angs*x.sisa,pdr=tot-sis,h=hist(x).filter(Boolean),last=h.length?h[h.length-1]:null,pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0;tI+=pdr;tS+=sis;if(x.sisa>0)n++;
+$('tb3').innerHTML=data.map(function(x){var tot=x.angs*x.bulan,sis=x.angs*x.sisa,pdr=tot-sis,h=hist(x).filter(Boolean),last=h.length?h[h.length-1]:null,pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0;if(!x.tanda){tI+=pdr;tS+=sis;if(x.sisa>0)n++}
 return '<tr><td><b>'+esc(x.nama)+'</b></td><td>'+esc(x.ket)+'</td><td class=n>'+rp(tot)+'</td><td class=n>'+rp(pdr)+'</td><td class=n><b>'+rp(sis)+'</b></td><td class=n>'+x.sisa+' / '+x.bulan+'</td><td>'+(last?dT(last):'-')+'</td><td><div class=pg><i style=width:'+pct+'%></i></div></td><td style=white-space:nowrap>'+(x.sisa>0?'<button class=p onclick=openP('+x.id+')>✓ Bayar</button> ':'<span class="bd l">Lunas</span> ')+'<button onclick=riw('+x.id+')>Riwayat</button></td></tr>'}).join('');
 $('tf3').innerHTML='<tr><td colspan=3>Total</td><td class=n>'+rp(tI)+'</td><td class=n>'+rp(tS)+'</td><td colspan=4></td></tr>';
 $('sk').innerHTML='<div class=c><small>Total sisa pinjaman</small><b>'+rp(tS)+'</b></div><div class=c><small>Sudah dibayar</small><b>'+rp(tI)+'</b></div><div class=c><small>Kredit belum lunas</small><b>'+n+'</b></div>'}
 function riw(id){var x=byId(id),h=hist(x);$('rt').textContent='Riwayat Pembayaran — '+x.nama;
 $('rb').innerHTML='<div class=pv>Sisa pinjaman sekarang: <b>'+rp(x.angs*x.sisa)+'</b> ('+x.sisa+' bulan lagi)</div>'+(h.length?'<div class=tw><table style=min-width:0><thead><tr><th>Ke-</th><th>Tanggal bayar</th><th>Jumlah</th><th>Sisa pinjaman</th></tr></thead><tbody>'+h.map(function(d,i){return '<tr><td>'+(i+1)+'</td><td>'+dT(d)+'</td><td class=n>'+rp(x.angs)+'</td><td class=n>'+rp(x.angs*(x.bulan-i-1))+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class=em>Belum ada pembayaran.</div>');$('rd').showModal()}
+var RM={};try{RM=JSON.parse(localStorage.getItem("kredit_rem")||"{}")}catch(e){}
+var qL=[],qi=0,qs=0;
+function waT(x){var n=x.bulan-x.sisa+1,d=dd(x),s=d<0?"sudah lewat jatuh tempo "+(-d)+" hari":d===0?"jatuh tempo hari ini":"akan jatuh tempo pada "+fmD(nd(x));return "Halo "+x.nama+", mengingatkan angsuran ke-"+n+" dari "+x.bulan+(x.ket?" ("+x.ket+")":"")+" sebesar "+rp(x.angs)+" "+s+" ("+fmD(nd(x))+"). Mohon konfirmasi pembayarannya. Terima kasih 🙏"}
+function waU(x){var p=(x.hp||"").replace(/\D/g,"");if(p.indexOf("0")===0)p="62"+p.slice(1);return "https://wa.me/"+p+"?text="+encodeURIComponent(waT(x))}
+function qR(){var c=$("qc");
+if(!qL.length){$("qh").textContent="📨 Ingatkan semua";c.innerHTML='<div class=em>'+(qs?'Semua pengingat hari ini sudah diproses ('+qs+' pelanggan).':'Tidak ada tagihan jatuh tempo dalam jangkauan ini.')+'</div>';return}
+if(qi>=qL.length){$("qh").textContent="📨 Selesai";c.innerHTML='<div class=em>✅ Selesai, '+qL.length+' pelanggan diproses.</div>';return}
+var x=qL[qi];$("qh").textContent="📨 Pengingat "+(qi+1)+" / "+qL.length;
+c.innerHTML='<p style="margin:10px 0 4px"><b>'+esc(x.nama)+'</b> '+bdg(x)+'</p><div class=pv>'+esc(x.ket||"-")+' • '+rp(x.angs)+' • jatuh tempo '+fmD(nd(x))+'</div>'+(x.hp?'':'<div class=pv style="color:var(--am)">⚠️ Nomor WA belum diisi. WhatsApp akan meminta Anda memilih kontak.</div>')+'<div class=c style="white-space:pre-wrap;font-size:14px;margin-bottom:12px">'+esc(waT(x))+'</div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick=qN(0)>Lewati</button><button class=p onclick=qN(1)>💬 Buka WhatsApp</button></div>'+(qs?'<div class=pv style="margin-top:8px">'+qs+' lainnya sudah diingatkan hari ini dan dilewati.</div>':'')}
+function qN(go){var x=qL[qi];if(go){window.open(waU(x),"_blank");RM[x.id]=iso(new Date());try{localStorage.setItem("kredit_rem",JSON.stringify(RM))}catch(e){}}qi++;qR()}
+$("qb").onclick=function(){var all=data.filter(function(x){return x.sisa>0&&dd(x)!==null&&dd(x)<=+$("rw").value}).sort(function(a,b){return dd(a)-dd(b)}),td=iso(new Date());qL=all.filter(function(x){return RM[x.id]!==td});qs=all.length-qL.length;qi=0;qR();$("qd").showModal()};
+$("qx").onclick=function(){$("qd").close()};
+async function svF(name,data){try{var dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;if(dl){await dl.save({filename:name,data:data});return}}catch(e){if(e&&e.code==="declined")return}
+var b=data instanceof Blob?data:new Blob([data]),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(u)},4000)}
+function xlsx(){
+if(!window.XLSX){alert("Pustaka Excel belum termuat. Periksa koneksi internet, lalu coba lagi.");return}
+var MN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+var xs=function(s){var p=s.split("-");return Math.round(Date.UTC(+p[0],+p[1]-1,+p[2])/864e5)+25569};
+var mi=function(s){var p=s.split("-");return +p[0]*12+(+p[1]-1)};
+var cur=T.getFullYear()*12+T.getMonth(),mn=1e9,mx=-1;
+var rs=data.map(function(x){var pm={};hist(x).forEach(function(s,i){if(!s||!x.tgl)return;var k=mi(x.tgl)+i+1;pm[k]=xs(s);if(k<mn)mn=k;if(k>mx)mx=k});return {x:x,pm:pm}});
+if(mx<0){mn=cur;mx=cur}if(mx<cur)mx=cur;
+var A=[["USER","KETERANGAN","TANGGAL KREDIT","DP","ANGSURAN","BULAN","TOTAL","SISA ANGSURAN","SISA TAGIHAN"]];
+for(var k=mn;k<=mx;k++)A[0].push(MN[k%12]+" "+Math.floor(k/12));
+rs.forEach(function(r){var x=r.x,row=[x.nama,x.ket||"",x.tgl?xs(x.tgl):null,x.dp||null,x.angs,x.bulan,x.angs*x.bulan,x.sisa,x.angs*x.sisa];for(var k=mn;k<=mx;k++)row.push(r.pm[k]==null?null:r.pm[k]);A.push(row)});
+var U=XLSX.utils,ws=U.aoa_to_sheet(A),RP='"Rp"#,##0';
+A.forEach(function(row,i){if(!i)return;var n=i+1;
+[[2,"d mmmm yyyy"],[3,RP],[4,RP],[6,RP],[8,RP]].forEach(function(f){var c=ws[U.encode_cell({r:i,c:f[0]})];if(c)c.z=f[1]});
+var g=ws["G"+n],q=ws["I"+n];if(g)g.f="E"+n+"*F"+n;if(q)q.f="E"+n+"*H"+n;
+for(var j=9;j<row.length;j++){var c=ws[U.encode_cell({r:i,c:j})];if(c)c.z="d mmmm"}});
+ws["!cols"]=[{wch:22},{wch:30},{wch:16},{wch:14},{wch:14},{wch:8},{wch:16},{wch:15},{wch:16}].concat(Array(mx-mn+1).fill({wch:14}));
+ws["!autofilter"]={ref:U.encode_range({s:{r:0,c:0},e:{r:A.length-1,c:A[0].length-1}})};
+var B=[["USER","KETERANGAN","ANGSURAN KE","TANGGAL BAYAR","JUMLAH","SISA PINJAMAN SETELAH BAYAR"]];
+data.forEach(function(x){hist(x).forEach(function(s,i){B.push([x.nama,x.ket||"",i+1,s?xs(s):null,x.angs,x.angs*(x.bulan-i-1)])})});
+var w2=U.aoa_to_sheet(B);B.forEach(function(row,i){if(!i)return;[[3,"d mmmm yyyy"],[4,RP],[5,RP]].forEach(function(f){var c=w2[U.encode_cell({r:i,c:f[0]})];if(c)c.z=f[1]})});
+w2["!cols"]=[{wch:22},{wch:30},{wch:12},{wch:18},{wch:14},{wch:26}];
+var wb=U.book_new();U.book_append_sheet(wb,ws,"Data Kredit");U.book_append_sheet(wb,w2,"Riwayat Bayar");
+var out=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+svF("kredit-"+iso(new Date())+".xlsx",new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}))}
+$("xl").onclick=xlsx;
 function popP(sel){var a=data.filter(function(x){return x.sisa>0});$("ps").innerHTML=a.map(function(x){return '<option value="'+x.id+'"'+(x.id===sel?' selected':'')+'>'+esc(x.nama)+(x.ket?' — '+esc(x.ket):'')+' • sisa '+rp(x.angs*x.sisa)+'</option>'}).join("")}
 function pp(){var x=byId(+$("ps").value);if(!x){$("pi").textContent="";return}var m=Math.min(x.sisa,Math.max(1,+$("pm").value||1)),ns=x.sisa-m;$("pi").innerHTML="Angsuran "+rp(x.angs)+" × "+m+" bln = <b>"+rp(x.angs*m)+"</b><br>Sisa bulan: "+x.sisa+" → <b>"+ns+"</b><br>Sisa pinjaman: "+rp(x.angs*x.sisa)+" → <b>"+rp(x.angs*ns)+"</b>"+(ns===0?" (LUNAS)":"")}
 function openP(id){if(!data.some(function(x){return x.sisa>0})){alert("Semua kredit sudah lunas.");return}popP(id);$("pm").value=1;$("pt").value=iso(new Date());pp();$("pd").showModal()}
@@ -202,7 +249,7 @@ $("po").onclick=function(){var x=byId(+$("ps").value);if(!x)return;var m=Math.mi
 function pv(){var a=+$("fa").value||0,b=+$("fb").value||0,s=+$("fs").value||0,d=+$("fd").value||0,m=+$("fm").value||0;$("pv").textContent="Total: "+rp(a*b)+"  •  Sisa tagihan: "+rp(a*s)+(m?"  •  Untung: "+rp(d+a*b-m):"")}
 function openF(x){editId=x?x.id:null;$("dt").textContent=x?"Edit Kredit":"Tambah Kredit";
 $("fn").value=x?x.nama:"";$("fk").value=x?x.ket:"";$("fh").value=x&&x.hp?x.hp:"";$("ft").value=x?x.tgl:iso(new Date());
-$("fd").value=x?x.dp:"";$("fm").value=x&&x.modal?x.modal:"";$("fa").value=x?x.angs:"";$("fb").value=x?x.bulan:12;$("fs").value=x?x.sisa:12;pv();$("dl").showModal()}
+$("fd").value=x?x.dp:"";$("fm").value=x&&x.modal?x.modal:"";$("ftd").checked=!!(x&&x.tanda);$("fa").value=x?x.angs:"";$("fb").value=x?x.bulan:12;$("fs").value=x?x.sisa:12;pv();$("dl").showModal()}
 function edit(id){openF(byId(id))}
 $("add").onclick=function(){openF(null)};
 $("cx").onclick=function(){$("dl").close()};
@@ -211,20 +258,20 @@ $("fb").onchange=function(){if(!editId)$("fs").value=$("fb").value;pv()};
 $("sv").onclick=function(){
 var n=$("fn").value.trim();if(!n){alert("Nama wajib diisi");return}
 var bulan=Math.max(1,+$("fb").value||1),sisa=Math.min(bulan,Math.max(0,+$("fs").value||0));
-var o={nama:n,ket:$("fk").value.trim(),hp:$("fh").value.trim(),tgl:$("ft").value,dp:+$("fd").value||0,modal:+$("fm").value||0,angs:+$("fa").value||0,bulan:bulan,sisa:sisa};
+var o={nama:n,ket:$("fk").value.trim(),hp:$("fh").value.trim(),tgl:$("ft").value,dp:+$("fd").value||0,modal:+$("fm").value||0,tanda:$("ftd").checked,angs:+$("fa").value||0,bulan:bulan,sisa:sisa};
 if(editId){Object.assign(byId(editId),o)}else{o.id=Date.now();data.push(o)}
 save();$("dl").close();render()};
 $("q").oninput=table;$("st").onchange=table;$("rw").onchange=dash;$("rc").onclick=function(){$("rd").close()};
-$("bk").onclick=function(){var a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,1));a.download='kredit-cadangan.json';a.click()};
+$("bk").onclick=function(){svF('kredit-cadangan.json',JSON.stringify(data,null,1))};
 $("csv2").onclick=function(){var l=['"User","Keterangan","Angsuran ke","Tanggal Pembayaran","Jumlah Dibayar","Sisa Pinjaman Setelah Bayar","Sisa Bulan"'];
 data.forEach(function(x){hist(x).forEach(function(t,i){l.push([x.nama,x.ket,i+1,t,x.angs,x.angs*(x.bulan-i-1),x.bulan-i-1].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(','))})});
-var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\ufeff'+l.join('\n'));a.download='riwayat-pembayaran.csv';a.click()};
+svF('riwayat-pembayaran.csv','\ufeff'+l.join('\n'))};
 function tab(n){[1,2,3].forEach(function(i){$("v"+i).style.display=i===n?"":"none";$("t"+i).className=i===n?"on":""})}
 $("t1").onclick=function(){tab(1)};$("t2").onclick=function(){tab(2)};$("t3").onclick=function(){tab(3)};
 $("csv").onclick=function(){
 var h=["User","Keterangan","No WA","Tanggal Kredit","DP","Angsuran","Bulan","Total","Modal","Untung","Kurang","Sisa Pinjaman","Jatuh Tempo","Tanggal Pembayaran"];
 var l=[h.join(",")].concat(data.map(function(x){var d=nd(x);return [x.nama,x.ket,x.hp||"",x.tgl,x.dp,x.angs,x.bulan,x.angs*x.bulan,x.modal||0,(x.dp||0)+x.angs*x.bulan-(x.modal||0),x.sisa,x.angs*x.sisa,d?iso(d):"Lunas",hist(x).map(function(t,i){return (i+1)+":"+(t||"-")}).join("; ")].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(",")}));
-var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent("\ufeff"+l.join("\n"));a.download="kredit.csv";a.click()};
+svF("kredit.csv","\ufeff"+l.join("\n"))};
 var SB="https://cjticmrfcuivoiyffssg.supabase.co",KEYP="sb_publishable_JQy4qmZyayz4zdyc-McMJg_09uBcUA5",SK="kredit_sb_session",sess=null,srv=[],tm=null;
 function ss(t,c){var e=$("sync");e.textContent=t;e.style.color=c||"var(--mu)"}
 function setS(s){sess=s;try{localStorage.setItem(SK,JSON.stringify(s))}catch(e){}}
@@ -234,8 +281,8 @@ async function api(p,m,body,extra,re){var h=Object.assign({apikey:KEYP,Authoriza
 var r=await fetch(SB+p,{method:m||"GET",headers:h,body:body?JSON.stringify(body):undefined});
 if(r.status===401&&sess){if(!re&&await refresh())return api(p,m,body,extra,1);showLogin();throw new Error("Sesi habis, silakan masuk lagi")}
 if(!r.ok)throw new Error((await r.text())||r.status);var t=await r.text();return t?JSON.parse(t):null}
-function fromRow(r){return{id:r.id,nama:r.nama,ket:r.ket||"",hp:r.hp||"",tgl:r.tgl||"",dp:+r.dp||0,modal:+r.modal||0,angs:+r.angs||0,bulan:r.bulan,sisa:r.sisa,bayar:r.bayar||[]}}
-function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],updated_at:new Date().toISOString()}}
+function fromRow(r){return{id:r.id,nama:r.nama,ket:r.ket||"",hp:r.hp||"",tgl:r.tgl||"",dp:+r.dp||0,modal:+r.modal||0,angs:+r.angs||0,bulan:r.bulan,sisa:r.sisa,bayar:r.bayar||[],tanda:!!r.tanda}}
+function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],tanda:!!x.tanda,updated_at:new Date().toISOString()}}
 async function load(){ss("Memuat…");try{var rows=await api("/rest/v1/kredit?select=*&order=id");data=rows.map(fromRow);srv=data.map(function(x){return x.id});render();ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ "+e.message,"var(--wr)")}}
 function sync(){ss("Menyimpan…");clearTimeout(tm);tm=setTimeout(push,500)}
 async function push(){try{var cur=data.map(function(x){return x.id}),gone=srv.filter(function(i){return cur.indexOf(i)<0});

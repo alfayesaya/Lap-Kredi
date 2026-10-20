@@ -58,12 +58,12 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 <body>
 <div class="w">
 <div class="hd" style="margin-bottom:12px"><h1 style="margin:0">📒 Pencatat Kredit</h1><div style="display:flex;gap:8px;align-items:center"><span id="sync" style="font-size:13px"></span><button id="lo">Keluar</button></div></div>
-<div class="tabs"><button id="t1" class="on">📊 Dashboard <span id="cnt"></span></button><button id="t2">📋 Data Kredit</button><button id="t3">💰 Sisa Pinjaman</button><button class="p" id="payb" style="margin-left:auto">✓ Catat Pembayaran</button></div>
+<div class="tabs"><button id="t1" class="on">📊 Dashboard <span id="cnt"></span></button><button id="t2">📋 Data Kredit</button><button id="t3">💰 Sisa Pinjaman</button><button id="qa" style="margin-left:auto">📨 Ingatkan Semua</button><button class="p" id="payb">✓ Catat Pembayaran</button></div>
 
 <div id="v1">
 <div class="cards" id="kpi"></div>
 <div class="c sec">
-<div class="hd"><h2>🔔 Pengingat Pembayaran</h2><label style="font-size:13px;color:var(--mu)">Tampilkan jatuh tempo dalam <select id="rw"><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="14">14 hari</option><option value="30">30 hari</option></select></label><button class="p" id="qb">📨 Ingatkan semua</button></div>
+<div class="hd"><h2>🔔 Pengingat Pembayaran</h2><label style="font-size:13px;color:var(--mu)">Tampilkan jatuh tempo dalam <select id="rw"><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="14">14 hari</option><option value="30">30 hari</option><option value="9999">Semua kredit berjalan</option></select></label><button class="p" id="qb">📨 Ingatkan semua</button></div>
 <div id="rem"></div>
 </div>
 <div class="c sec"><h2>Proyeksi angsuran masuk (6 bulan ke depan)</h2><div id="chart"></div></div>
@@ -210,7 +210,7 @@ var x=qL[qi];$("qh").textContent="📨 Pengingat "+(qi+1)+" / "+qL.length;
 c.innerHTML='<p style="margin:10px 0 4px"><b>'+esc(x.nama)+'</b> '+bdg(x)+'</p><div class=pv>'+esc(x.ket||"-")+' • '+rp(x.angs)+' • jatuh tempo '+fmD(nd(x))+'</div>'+(x.hp?'':'<div class=pv style="color:var(--am)">⚠️ Nomor WA belum diisi. WhatsApp akan meminta Anda memilih kontak.</div>')+'<div class=c style="white-space:pre-wrap;font-size:14px;margin-bottom:12px">'+esc(waT(x))+'</div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick=qN(0)>Lewati</button><button class=p onclick=qN(1)>💬 Buka WhatsApp</button></div>'+(qs?'<div class=pv style="margin-top:8px">'+qs+' lainnya sudah diingatkan hari ini dan dilewati.</div>':'')}
 function qN(go){var x=qL[qi];if(go){window.open(waU(x),"_blank");RM[x.id]=iso(new Date());try{localStorage.setItem("kredit_rem",JSON.stringify(RM))}catch(e){}}qi++;qR()}
 $("qb").onclick=function(){var all=data.filter(function(x){return x.sisa>0&&dd(x)!==null&&dd(x)<=+$("rw").value}).sort(function(a,b){return dd(a)-dd(b)}),td=iso(new Date());qL=all.filter(function(x){return RM[x.id]!==td});qs=all.length-qL.length;qi=0;qR();$("qd").showModal()};
-$("qx").onclick=function(){$("qd").close()};
+$("qx").onclick=function(){$("qd").close()};$("qa").onclick=function(){$("qb").click()};
 async function svF(name,data){try{var dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;if(dl){await dl.save({filename:name,data:data});return}}catch(e){if(e&&e.code==="declined")return}
 var b=data instanceof Blob?data:new Blob([data]),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(u)},4000)}
 function xlsx(){

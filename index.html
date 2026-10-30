@@ -84,7 +84,55 @@ dialog::backdrop{background:rgba(10,25,50,.45)}
 .lbl{cursor:pointer;border:1px solid var(--br);border-radius:99px;padding:9px 16px;background:var(--card)}
 .br{display:grid;grid-template-columns:78px 1fr 120px;gap:8px;align-items:center;margin:7px 0;font-size:14px}
 .tr{height:14px;background:var(--br);border-radius:4px;overflow:hidden}.tr i{display:block;height:100%;background:var(--bar)}
-@media(max-width:860px){.app{grid-template-columns:1fr;padding:12px;margin:8px;border-radius:26px}.sb{flex-direction:row;justify-content:center;position:static;padding:10px}.logo{margin:0 10px 0 0}.g3,.g2c{grid-template-columns:1fr}.tr2{margin-left:0}.top h1{font-size:22px}}
+@media(min-width:1500px){.app{max-width:1500px}}
+@media(max-width:1180px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.g3>.c:last-child{grid-column:1/-1}.g2c{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:860px){
+.app{grid-template-columns:minmax(0,1fr);padding:12px 12px 100px;margin:0;border:0;border-radius:0;gap:12px}
+.sb{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;flex-direction:row;justify-content:space-around;border-radius:22px 22px 0 0;padding:10px 24px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(0,0,0,.1);align-self:auto}
+.logo{display:none}.sb button{width:52px;height:46px;border-radius:23px}
+.g3,.g2c{grid-template-columns:minmax(0,1fr)}.g3>.c:last-child{grid-column:auto}
+.top h1{font-size:22px;flex:1}.top #gs{order:3;flex:1 1 100%;max-width:none;font-size:16px}
+.tr2{margin-left:0;width:100%;order:2}.tr2 button{flex:1;padding:10px 8px;font-size:14px;min-height:42px}.av{display:none}
+.big{font-size:19px}.bn{padding:14px}.rk{font-size:36px}
+input,select{font-size:16px}
+dialog{width:94vw;max-height:90vh;overflow:auto;padding:16px}
+.tw{background:transparent;overflow:visible}
+table,thead,tbody,tr,td{display:block;width:100%;min-width:0!important}
+thead,tfoot{display:none}
+tbody tr{background:var(--card);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:4px 0;text-align:right}
+td::before{color:var(--mu);font-size:12px;flex:none;text-align:left}
+td:first-child{font-size:17px;justify-content:flex-start;text-align:left;padding-bottom:6px}
+td.em{display:block;text-align:center}td.em::before{display:none}
+td .pg{flex:1;max-width:170px}
+td.a{position:static;box-shadow:none;background:transparent;flex-wrap:wrap;justify-content:flex-start;padding-top:10px;white-space:normal}
+td.a button{min-height:38px;margin-bottom:4px}
+.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bar button,.bar .lbl{flex:1 1 auto;text-align:center}
+}
+#v2 tbody td:nth-child(1)::before{content:"User";display:none}
+#v2 tbody td:nth-child(2)::before{content:"Keterangan"}
+#v2 tbody td:nth-child(3)::before{content:"Tgl Kredit"}
+#v2 tbody td:nth-child(4)::before{content:"DP"}
+#v2 tbody td:nth-child(5)::before{content:"Angsuran"}
+#v2 tbody td:nth-child(6)::before{content:"Bulan"}
+#v2 tbody td:nth-child(7)::before{content:"Total"}
+#v2 tbody td:nth-child(8)::before{content:"Modal"}
+#v2 tbody td:nth-child(9)::before{content:"Untung"}
+#v2 tbody td:nth-child(10)::before{content:"Kurang"}
+#v2 tbody td:nth-child(11)::before{content:"Sisa Tagihan"}
+#v2 tbody td:nth-child(12)::before{content:"Jatuh Tempo"}
+#v2 tbody td:nth-child(13)::before{content:"Progres"}
+#v2 tbody td:nth-child(14)::before{content:"";display:none}
+#v3 tbody td:nth-child(1)::before{content:"User";display:none}
+#v3 tbody td:nth-child(2)::before{content:"Keterangan"}
+#v3 tbody td:nth-child(3)::before{content:"Total Pinjaman"}
+#v3 tbody td:nth-child(4)::before{content:"Sudah Dibayar"}
+#v3 tbody td:nth-child(5)::before{content:"Sisa Pinjaman"}
+#v3 tbody td:nth-child(6)::before{content:"Sisa Bulan"}
+#v3 tbody td:nth-child(7)::before{content:"Bayar Terakhir"}
+#v3 tbody td:nth-child(8)::before{content:"Progres"}
+#v3 tbody td:nth-child(9)::before{content:"";display:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>

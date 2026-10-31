@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pencatat Kredit</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 :root{--bg:#bfe3ff;--fr:#e3f1ff;--card:#fff;--tx:#17212f;--mu:#7d8aa0;--br:#e7eef7;--thb:#eaf4ff;--pr:#1f8fe0;--prt:#fff;--bar:#55bbff;--pk:#ff6b8b;--yl:#ffdc6b;--ylt:#3a2f00;--ok:#1f9d63;--wr:#e5486b;--am:#b7791f;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -17,8 +19,11 @@ body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-app
 .logo{width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--bar) 0 60%,var(--pk) 0 85%,var(--yl) 0);-webkit-mask:radial-gradient(circle,transparent 11px,#000 12px);mask:radial-gradient(circle,transparent 11px,#000 12px);margin-bottom:14px}
 .sb button{width:48px;height:48px;border-radius:50%;border:0;background:var(--br);font-size:21px;padding:0;position:relative}
 .sb button.on{background:var(--yl)}
-#cnt{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;border-radius:99px;background:var(--pk);color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;padding:0 5px}
-#cnt:empty{display:none}
+#cnt,#cnt4,#cnt5{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;border-radius:99px;background:var(--pk);color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;padding:0 5px}
+#cnt:empty,#cnt4:empty,#cnt5:empty{display:none}
+.kwrap{max-width:720px;margin:0 auto;padding:14px 14px 40px}
+#xbp img{display:block;max-width:100%;max-height:180px;border-radius:12px;margin-top:8px;border:1px solid var(--br)}
+.lk{background:none;border:0;color:var(--pr);padding:4px 0;text-decoration:underline}
 .mn{min-width:0}
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:18px}
 .top h1{margin:0;font-size:26px;font-weight:800}
@@ -133,6 +138,17 @@ td.a button{min-height:38px;margin-bottom:4px}
 #v3 tbody td:nth-child(7)::before{content:"Bayar Terakhir"}
 #v3 tbody td:nth-child(8)::before{content:"Progres"}
 #v3 tbody td:nth-child(9)::before{content:"";display:none}
+.rolegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.role{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border-radius:22px;padding:18px;border:2px solid var(--br);background:var(--card);min-height:150px}
+.role .ic{font-size:30px;margin-bottom:6px}.role b{font-size:17px}.role small{color:var(--mu);line-height:1.35}
+.role:hover,.role:focus-visible{border-color:var(--pr);outline:0}
+.role.adm{background:var(--yl);color:var(--ylt);border-color:transparent}.role.adm small{color:inherit;opacity:.8}
+.back{padding:4px 12px;font-size:13px;margin-bottom:10px}
+#kf{width:100%;min-width:0}
+#kp img{display:block;max-width:100%;max-height:200px;border-radius:12px;margin-top:8px;border:1px solid var(--br)}
+.okc{text-align:center;padding:10px 0}.okc .rk{font-size:54px}
+#rq .rl:first-child{border-top:0}
+@media(max-width:480px){.rolegrid{grid-template-columns:1fr}.role{min-height:0}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -142,6 +158,8 @@ td.a button{min-height:38px;margin-bottom:4px}
 <button id="t1" class="on" title="Dashboard">🏠<span id="cnt"></span></button>
 <button id="t2" title="Data Kredit">📋</button>
 <button id="t3" title="Sisa Pinjaman">💰</button>
+<button id="t4" title="Pengajuan Kredit">📥<span id="cnt4"></span></button>
+<button id="t5" title="Bukti Bayar">🧾<span id="cnt5"></span></button>
 </aside>
 <main class="mn">
 <div class="top"><h1 id="pt">Ringkasan</h1><input id="gs" placeholder="Cari pelanggan…"><div class="tr2"><span id="sync" style="font-size:13px"></span><button id="lo">Keluar</button><button id="qa">📨 Ingatkan Semua</button><button class="p" id="payb">✓ Catat Pembayaran</button><span class="av">K</span></div></div>
@@ -180,9 +198,77 @@ td.a button{min-height:38px;margin-bottom:4px}
 <div class="bar"><button class="p" onclick="$('xl').click()">📥 Ekspor Excel</button><button onclick="$('csv').click()">Ekspor CSV</button><button onclick="$('csv2').click()">Ekspor Riwayat Bayar</button></div>
 <div class="tw"><table style="min-width:900px"><thead><tr><th>User</th><th>Keterangan</th><th>Total Pinjaman</th><th>Sudah Dibayar</th><th>Sisa Pinjaman</th><th>Sisa Bulan</th><th>Bayar Terakhir</th><th>Progres</th><th>Aksi</th></tr></thead><tbody id="tb3"></tbody><tfoot id="tf3"></tfoot></table></div>
 </div>
+<div id="v4" style="display:none">
+<div class="bar"><select id="rf"><option value="baru">Belum diproses</option><option value="all">Semua pengajuan</option></select><button id="rr">↻ Muat ulang</button></div>
+<div class="c" id="rq"></div>
+</div>
+<div id="v5" style="display:none">
+<div class="bar"><select id="yf"><option value="menunggu">Menunggu konfirmasi</option><option value="all">Semua bukti bayar</option></select><button id="yr">↻ Muat ulang</button></div>
+<div class="c" id="yl"></div>
+</div>
 </main></div>
+<div id="ka" style="display:none"><div class="kwrap">
+<div class="top"><h1 id="kh1">Akun Saya</h1><div class="tr2"><button id="kpush">🔔 Aktifkan notifikasi</button><button id="knew">+ Ajukan kredit baru</button><button id="klo">Keluar</button></div></div>
+<div id="kbn"></div><div id="kcr"></div>
+<div class="c" style="margin-bottom:14px"><h2>Bukti pembayaran saya</h2><div id="kpb"></div></div>
+<div class="c"><h2>Pengajuan kredit saya</h2><div id="kpj"></div></div>
+</div></div>
 
-<div id="lg" style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px"><div class="c" style="width:min(360px,100%)"><h2>🔐 Masuk</h2><div class="f"><label>Email</label><input id="le" type="email"></div><div class="f"><label>Password</label><input id="lp" type="password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button></div></div>
+<div id="lg" style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;padding:16px;overflow:auto"><div class="c" style="width:min(440px,100%);margin:auto">
+<div id="s0">
+<h2 style="font-size:22px">Pencatat Kredit</h2>
+<div class="pv" style="margin-bottom:0">Anda masuk sebagai siapa?</div>
+<div class="rolegrid">
+<button class="role adm" id="ra"><span class="ic">🔐</span><b>Admin</b><small>Kelola data kredit dan pembayaran</small></button>
+<button class="role" id="rk"><span class="ic">🛍️</span><b>Kreditur</b><small>Ajukan kredit baru</small></button>
+</div>
+</div>
+<div id="s1" style="display:none">
+<button class="back" id="ab">‹ Kembali</button>
+<h2>🔐 Masuk Admin</h2><div class="f" style="margin-top:10px"><label>Email</label><input id="le" type="email"></div><div class="f"><label>Password</label><input id="lp" type="password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button>
+</div>
+<div id="s2" style="display:none">
+<button class="back" id="kback">‹ Kembali</button>
+<h2>🛍️ Daftar &amp; Ajukan Kredit</h2>
+<div class="pv">Buat akun untuk memantau angsuran dan mengirim bukti bayar. Foto KTP hanya bisa dilihat admin.</div>
+<div class="f"><label for="kn">Nama lengkap</label><input id="kn" autocomplete="name"></div>
+<div class="g2"><div class="f"><label for="ke">Email</label><input id="ke" type="email" autocomplete="email"></div><div class="f"><label for="kw">Password (min. 6)</label><input id="kw" type="password" autocomplete="new-password"></div></div>
+<div class="f"><label for="kh">No. WhatsApp (opsional)</label><input id="kh" inputmode="tel" autocomplete="tel" placeholder="08123456789"></div>
+<div class="f"><label for="kf">Foto KTP</label><input id="kf" type="file" accept="image/*" style="width:100%;min-width:0"><div id="kp"></div></div>
+<div class="f"><label for="kb">Barang yang ingin dikredit</label><input id="kb" placeholder="mis. iPhone 13 128GB"></div>
+<div class="f"><label for="kd">DP (Rp) — isi 0 jika tanpa DP</label><input id="kd" type="number" min="0" inputmode="numeric"><div class="pv" id="kdp" style="margin:2px 0 0"></div></div>
+<div class="pv" id="km" role="status"></div>
+<button class="p" id="ks" style="width:100%">Daftar &amp; Kirim Pengajuan</button>
+</div>
+<div id="s3" style="display:none">
+<div class="okc"><div class="rk">📧</div><h2 style="margin:8px 0">Akun dibuat</h2><div class="pv">Cek email Anda dan klik tautan konfirmasi. Setelah itu masuk dengan email dan password Anda, pengajuan akan terkirim otomatis.</div></div>
+<div style="text-align:center"><button class="p" id="khome">Ke halaman masuk</button></div>
+</div>
+<div id="s4" style="display:none">
+<button class="back" id="cback">‹ Kembali</button>
+<h2>🛍️ Masuk Kreditur</h2><div class="f" style="margin-top:10px"><label for="ce">Email</label><input id="ce" type="email" autocomplete="email"></div><div class="f"><label for="cw">Password</label><input id="cw" type="password" autocomplete="current-password"></div><div class="pv" id="cm"></div>
+<button class="p" id="cb" style="width:100%">Masuk</button>
+<div style="text-align:center;margin-top:12px" class="pv">Belum punya akun? <button class="lk" id="cr">Daftar &amp; ajukan kredit</button></div>
+</div>
+</div></div>
+<dialog id="xb">
+<h3 id="xbt" style="margin-top:0">Kirim Bukti Pembayaran</h3>
+<div class="g2"><div class="f"><label for="xbm">Jumlah bulan dibayar</label><input id="xbm" type="number" min="1" value="1"></div><div class="f"><label for="xbd">Tanggal bayar</label><input id="xbd" type="date"></div></div>
+<div class="f"><label for="xbf">Foto bukti bayar</label><input id="xbf" type="file" accept="image/*" style="width:100%;min-width:0"><div id="xbp"></div></div>
+<div class="pv" id="xbi"></div><div class="pv" id="xbn" role="status"></div>
+<div style="display:flex;gap:8px;justify-content:flex-end"><button id="xbc">Batal</button><button class="p" id="xbs">Kirim</button></div>
+</dialog>
+<dialog id="xn">
+<h3 style="margin-top:0">Ajukan Kredit Baru</h3>
+<div class="f"><label for="xnb">Barang yang ingin dikredit</label><input id="xnb"></div>
+<div class="f"><label for="xnd">DP (Rp) — isi 0 jika tanpa DP</label><input id="xnd" type="number" min="0" inputmode="numeric"></div>
+<div class="pv" id="xnm" role="status"></div>
+<div style="display:flex;gap:8px;justify-content:flex-end"><button id="xnc">Batal</button><button class="p" id="xns">Kirim</button></div>
+</dialog>
+<dialog id="kv" style="width:min(560px,94vw)">
+<div class="hd"><h3 id="kvt" style="margin:0"></h3><button id="kvx">Tutup</button></div>
+<div id="kvb" style="margin-top:10px"></div>
+</dialog>
 <dialog id="qd" style="width:min(460px,94vw)">
 <div class="hd"><h3 id="qh" style="margin:0"></h3><button id="qx">Tutup</button></div>
 <div id="qc"></div>
@@ -214,6 +300,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 </div>
 <div class="f"><label>Sisa bulan (kurang)</label><input id="fs" type="number" min="0"></div>
 <div class="f"><label>Modal (Rp) — harga beli barang</label><input id="fm" type="number" min="0"></div>
+<div class="f"><label>Akun kreditur (agar bisa memantau di aplikasi)</label><select id="fu"><option value="">— tidak ditautkan —</option></select></div>
 <div class="f"><label style="display:flex;gap:8px;align-items:center"><input id="ftd" type="checkbox"> Hanya penanda (dana belum cair, tidak dihitung)</label></div>
 <div class="pv" id="pv"></div>
 <div style="display:flex;gap:8px;justify-content:flex-end"><button id="cx">Batal</button><button class="p" id="sv">Simpan</button></div>
@@ -279,7 +366,7 @@ var pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0;
 return "<tr><td><b>"+esc(x.nama)+"</b></td><td>"+esc(x.ket)+"</td><td>"+fmD(new Date(x.tgl+"T00:00:00"))+"</td><td class=n>"+(x.dp?rp(x.dp):"-")+"</td><td class=n>"+rp(x.angs)+"</td><td class=n>"+x.bulan+"</td><td class=n>"+rp(tot)+"</td><td class=n>"+(x.modal?rp(x.modal):"-")+"</td><td class=n style='color:var("+(un>=0?"--ok":"--wr")+")'>"+(x.modal?rp(un):"-")+"</td><td class=n>"+(x.sisa>0?x.sisa:"0")+"</td><td class=n>"+rp(sis)+"</td><td>"+(x.sisa>0?fmD(nd(x))+"<br>":"")+bdg(x)+"</td><td><div class=pg title='"+pct+"%'><i style='width:"+pct+"%'></i></div></td><td class=a><button class=p onclick='openP("+x.id+")' title='Catat pembayaran'>✓ Bayar</button><button onclick='unpay("+x.id+")' title='Batalkan pembayaran terakhir'>↩</button><button onclick='wa("+x.id+")' title='Ingatkan via WhatsApp'>💬</button><button onclick='edit("+x.id+")'>Edit</button><button class=d onclick='del("+x.id+")'>Hapus</button></td></tr>"}).join(""):"<tr><td colspan=14 class=em>Belum ada data.</td></tr>";
 $("tf").innerHTML=rows.length?"<tr><td colspan=6>Total ("+rows.length+" data)</td><td class=n>"+rp(fT)+"</td><td class=n>"+rp(fM)+"</td><td class=n>"+rp(fU)+"</td><td></td><td class=n>"+rp(fS)+"</td><td colspan=3></td></tr>":"";
 }
-function render(){dash();table();table3()}
+function render(){dash();table();table3();renderReq();renderPay()}
 
 function pay(id){var x=byId(id);if(x&&x.sisa>0){x.sisa--;(x.bayar=x.bayar||[]).push(new Date().toISOString().slice(0,10));save();render()}}
 function unpay(id){var x=byId(id);if(x&&x.sisa<x.bulan&&confirm("Batalkan pembayaran terakhir "+x.nama+"?")){x.sisa++;if(x.bayar)x.bayar.pop();save();render()}}
@@ -349,7 +436,7 @@ $("ps").onchange=pp;$("pm").oninput=pp;
 $("pc").onclick=function(){$("pd").close()};
 $("po").onclick=function(){var x=byId(+$("ps").value);if(!x)return;var m=Math.min(x.sisa,Math.max(1,+$("pm").value||1));x.sisa-=m;x.bayar=x.bayar||[];for(var i=0;i<m;i++)x.bayar.push($("pt").value);save();$("pd").close();render()};
 function pv(){var a=+$("fa").value||0,b=+$("fb").value||0,s=+$("fs").value||0,d=+$("fd").value||0,m=+$("fm").value||0;$("pv").textContent="Total: "+rp(a*b)+"  •  Sisa tagihan: "+rp(a*s)+(m?"  •  Untung: "+rp(d+a*b-m):"")}
-function openF(x){editId=x?x.id:null;$("dt").textContent=x?"Edit Kredit":"Tambah Kredit";
+function openF(x){editId=x?x.id:null;fromReq=null;popU(x?x.uid:null);$("dt").textContent=x?"Edit Kredit":"Tambah Kredit";
 $("fn").value=x?x.nama:"";$("fk").value=x?x.ket:"";$("fh").value=x&&x.hp?x.hp:"";$("ft").value=x?x.tgl:iso(new Date());
 $("fd").value=x?x.dp:"";$("fm").value=x&&x.modal?x.modal:"";$("ftd").checked=!!(x&&x.tanda);$("fa").value=x?x.angs:"";$("fb").value=x?x.bulan:12;$("fs").value=x?x.sisa:12;pv();$("dl").showModal()}
 function edit(id){openF(byId(id))}
@@ -360,16 +447,16 @@ $("fb").onchange=function(){if(!editId)$("fs").value=$("fb").value;pv()};
 $("sv").onclick=function(){
 var n=$("fn").value.trim();if(!n){alert("Nama wajib diisi");return}
 var bulan=Math.max(1,+$("fb").value||1),sisa=Math.min(bulan,Math.max(0,+$("fs").value||0));
-var o={nama:n,ket:$("fk").value.trim(),hp:$("fh").value.trim(),tgl:$("ft").value,dp:+$("fd").value||0,modal:+$("fm").value||0,tanda:$("ftd").checked,angs:+$("fa").value||0,bulan:bulan,sisa:sisa};
+var o={nama:n,ket:$("fk").value.trim(),hp:$("fh").value.trim(),tgl:$("ft").value,dp:+$("fd").value||0,modal:+$("fm").value||0,tanda:$("ftd").checked,angs:+$("fa").value||0,bulan:bulan,sisa:sisa,uid:$("fu").value||null};
 if(editId){Object.assign(byId(editId),o)}else{o.id=Date.now();data.push(o)}
-save();$("dl").close();render()};
+save();$("dl").close();render();if(fromReq&&!editId){markReq(fromReq,"disetujui");fromReq=null}};
 $("q").oninput=table;$("st").onchange=table;$("rw").onchange=dash;$("rc").onclick=function(){$("rd").close()};
 $("bk").onclick=function(){svF('kredit-cadangan.json',JSON.stringify(data,null,1))};
 $("csv2").onclick=function(){var l=['"User","Keterangan","Angsuran ke","Tanggal Pembayaran","Jumlah Dibayar","Sisa Pinjaman Setelah Bayar","Sisa Bulan"'];
 data.forEach(function(x){hist(x).forEach(function(t,i){l.push([x.nama,x.ket,i+1,t,x.angs,x.angs*(x.bulan-i-1),x.bulan-i-1].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(','))})});
 svF('riwayat-pembayaran.csv','\ufeff'+l.join('\n'))};
-function tab(n){[1,2,3].forEach(function(i){$("v"+i).style.display=i===n?"":"none";$("t"+i).className=i===n?"on":""});$("pt").textContent=["","Ringkasan","Data Kredit","Sisa Pinjaman"][n]}
-$("t1").onclick=function(){tab(1)};$("t2").onclick=function(){tab(2)};$("t3").onclick=function(){tab(3)};
+function tab(n){[1,2,3,4,5].forEach(function(i){$("v"+i).style.display=i===n?"":"none";$("t"+i).className=i===n?"on":""});$("pt").textContent=["","Ringkasan","Data Kredit","Sisa Pinjaman","Pengajuan Kredit","Bukti Bayar"][n]}
+$("t1").onclick=function(){tab(1)};$("t2").onclick=function(){tab(2)};$("t3").onclick=function(){tab(3)};$("t4").onclick=function(){tab(4);loadReq()};$("t5").onclick=function(){tab(5);loadPay()};
 $("csv").onclick=function(){
 var h=["User","Keterangan","No WA","Tanggal Kredit","DP","Angsuran","Bulan","Total","Modal","Untung","Kurang","Sisa Pinjaman","Jatuh Tempo","Tanggal Pembayaran"];
 var l=[h.join(",")].concat(data.map(function(x){var d=nd(x);return [x.nama,x.ket,x.hp||"",x.tgl,x.dp,x.angs,x.bulan,x.angs*x.bulan,x.modal||0,(x.dp||0)+x.angs*x.bulan-(x.modal||0),x.sisa,x.angs*x.sisa,d?iso(d):"Lunas",hist(x).map(function(t,i){return (i+1)+":"+(t||"-")}).join("; ")].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(",")}));
@@ -377,26 +464,192 @@ svF("kredit.csv","\ufeff"+l.join("\n"))};
 var SB="https://cjticmrfcuivoiyffssg.supabase.co",KEYP="sb_publishable_JQy4qmZyayz4zdyc-McMJg_09uBcUA5",SK="kredit_sb_session",sess=null,srv=[],tm=null;
 function ss(t,c){var e=$("sync");e.textContent=t;e.style.color=c||"var(--mu)"}
 function setS(s){sess=s;try{localStorage.setItem(SK,JSON.stringify(s))}catch(e){}}
-function showLogin(){sess=null;try{localStorage.removeItem(SK)}catch(e){}$("lg").style.display="flex"}
+function showLogin(){sess=null;try{localStorage.removeItem(SK)}catch(e){}pane(0);document.querySelector(".app").style.display="";$("ka").style.display="none";$("lg").style.display="flex"}
 async function refresh(){try{var r=await fetch(SB+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:sess.refresh_token})});if(!r.ok)return false;setS(await r.json());return true}catch(e){return false}}
 async function api(p,m,body,extra,re){var h=Object.assign({apikey:KEYP,Authorization:"Bearer "+(sess?sess.access_token:KEYP)},body?{"Content-Type":"application/json"}:{},extra||{});
 var r=await fetch(SB+p,{method:m||"GET",headers:h,body:body?JSON.stringify(body):undefined});
 if(r.status===401&&sess){if(!re&&await refresh())return api(p,m,body,extra,1);showLogin();throw new Error("Sesi habis, silakan masuk lagi")}
 if(!r.ok)throw new Error((await r.text())||r.status);var t=await r.text();return t?JSON.parse(t):null}
-function fromRow(r){return{id:r.id,nama:r.nama,ket:r.ket||"",hp:r.hp||"",tgl:r.tgl||"",dp:+r.dp||0,modal:+r.modal||0,angs:+r.angs||0,bulan:r.bulan,sisa:r.sisa,bayar:r.bayar||[],tanda:!!r.tanda}}
-function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],tanda:!!x.tanda,updated_at:new Date().toISOString()}}
-async function load(){ss("Memuat…");try{var rows=await api("/rest/v1/kredit?select=*&order=id");data=rows.map(fromRow);srv=data.map(function(x){return x.id});render();ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ "+e.message,"var(--wr)")}}
+function fromRow(r){return{id:r.id,nama:r.nama,ket:r.ket||"",hp:r.hp||"",tgl:r.tgl||"",dp:+r.dp||0,modal:+r.modal||0,angs:+r.angs||0,bulan:r.bulan,sisa:r.sisa,bayar:r.bayar||[],tanda:!!r.tanda,uid:r.user_id||null}}
+function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],tanda:!!x.tanda,user_id:x.uid||null,updated_at:new Date().toISOString()}}
+async function load(){ss("Memuat…");try{var rows=await api("/rest/v1/kredit?select=*&order=id");data=rows.map(fromRow);srv=data.map(function(x){return x.id});render();loadReq();loadPay();loadProf();ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ "+e.message,"var(--wr)")}}
 function sync(){ss("Menyimpan…");clearTimeout(tm);tm=setTimeout(push,500)}
 async function push(){try{var cur=data.map(function(x){return x.id}),gone=srv.filter(function(i){return cur.indexOf(i)<0});
 if(data.length)await api("/rest/v1/kredit?on_conflict=id","POST",data.map(toRow),{Prefer:"resolution=merge-duplicates,return=minimal"});
 if(gone.length)await api("/rest/v1/kredit?id=in.("+gone.join(",")+")","DELETE");
 srv=cur;ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ Gagal menyimpan: "+e.message,"var(--wr)")}}
-async function login(){$("lm").textContent="Masuk…";try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("le").value.trim(),password:$("lp").value})});var j=await r.json();if(!r.ok)throw new Error(j.msg||j.error_description||"Email atau password salah");setS(j);$("lp").value="";$("lm").textContent="";$("lg").style.display="none";await load()}catch(x){$("lm").textContent=x.message}}
+async function login(){$("lm").textContent="Masuk…";try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("le").value.trim(),password:$("lp").value})});var j=await r.json();if(!r.ok)throw new Error(j.msg||j.error_description||"Email atau password salah");setS(j);if(!await isAdm()){clearS();throw new Error("Akun ini bukan admin. Gunakan menu Kreditur.")}$("lp").value="";$("lm").textContent="";$("lg").style.display="none";await load()}catch(x){$("lm").textContent=x.message}}
 $("lb").onclick=login;$("lp").onkeydown=function(e){if(e.key==="Enter")login()};
-$("lo").onclick=function(){showLogin();data=[];srv=[];render();ss("")};
+$("lo").onclick=function(){showLogin();data=[];srv=[];rq=[];pb=[];prof=[];render();ss("")};
 $("imp").onchange=function(ev){var f=ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var a=JSON.parse(rd.result);if(!Array.isArray(a))throw 0;if(!confirm("Impor "+a.length+" data kredit?"))return;if(data.length&&confirm("Hapus data lama dulu?\nOK = ganti semua dengan isi file\nBatal = gabungkan (ID sama ditimpa)"))data=[];a.forEach(function(x,i){x.id=x.id||Date.now()+i;var o=byId(x.id);if(o)Object.assign(o,x);else data.push(x)});save();render()}catch(e){alert("File JSON tidak valid")}};rd.readAsText(f);ev.target.value=""};
+
+/* ===== Pengajuan kredit: pilih peran, form kreditur, daftar pengajuan admin ===== */
+var rq=[],rqErr="",fromReq=null,ktpData="",PEND=null;
+function pane(n){[0,1,2,3,4].forEach(function(i){$("s"+i).style.display=i===n?"":"none"})}
+function km(t,bad){var e=$("km");e.textContent=t;e.style.color=bad?"var(--wr)":"var(--mu)"}
+$("ra").onclick=function(){pane(1);$("le").focus()};
+$("rk").onclick=function(){$("cm").textContent="";pane(4)};
+$("ab").onclick=function(){$("lm").textContent="";pane(0)};
+$("kback").onclick=function(){pane(4)};$("cback").onclick=function(){pane(0)};$("cr").onclick=function(){km("");pane(2)};
+$("khome").onclick=function(){pane(4)};
+
+$("kd").oninput=function(){$("kdp").textContent=this.value!==""?rp(+this.value):""};
+$("kf").onchange=function(){var f=this.files[0];ktpData="";$("kp").innerHTML="";if(!f)return;
+if(!/^image\//.test(f.type)){km("Berkas harus berupa foto.",1);this.value="";return}
+var img=new Image(),u=URL.createObjectURL(f);
+img.onload=function(){var M=1100,r=Math.min(1,M/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+c.getContext("2d").drawImage(img,0,0,c.width,c.height);ktpData=c.toDataURL("image/jpeg",.72);URL.revokeObjectURL(u);
+var pv=document.createElement("img");pv.src=ktpData;pv.alt="Pratinjau foto KTP";$("kp").appendChild(pv);km("")};
+img.onerror=function(){URL.revokeObjectURL(u);km("Foto tidak bisa dibaca. Coba pilih foto lain.",1)};
+img.src=u};
+$("ks").onclick=async function(){
+var n=$("kn").value.trim(),e=$("ke").value.trim(),w=$("kw").value,b=$("kb").value.trim(),d=$("kd").value;
+if(n.length<2){km("Nama wajib diisi.",1);return}
+if(!/^\S+@\S+\.\S+$/.test(e)){km("Isi email yang valid.",1);return}
+if(w.length<6){km("Password minimal 6 karakter.",1);return}
+if(!ktpData){km("Foto KTP wajib diunggah.",1);return}
+if(!b){km("Isi barang yang ingin dikredit.",1);return}
+if(d===""||+d<0){km("Isi DP (tulis 0 jika tanpa DP).",1);return}
+var btn=this;btn.disabled=true;km("Mendaftarkan akun…");
+try{var hp=$("kh").value.trim(),r=await fetch(SB+"/auth/v1/signup",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:e,password:w,data:{nama:n,hp:hp}})}),j=await r.json();
+if(!r.ok){var em=j.msg||j.message||j.error_description||"";throw new Error(/already/i.test(em)?"Email sudah terdaftar. Silakan masuk.":em||"Pendaftaran gagal")}
+PEND={nama:n,hp:hp,email:e,barang:b,dp:Math.round(+d),ktp:ktpData};
+try{localStorage.setItem("kredit_pend",JSON.stringify(PEND))}catch(x){}
+["kn","ke","kw","kh","kb","kd","kf"].forEach(function(i){$(i).value=""});$("kp").innerHTML="";$("kdp").textContent="";ktpData="";km("");
+if(j.access_token){setS(j);await enterK()}else pane(3)}
+catch(x){km(x.message,1)}
+btn.disabled=false};
+
+async function loadReq(){if(!sess)return;
+try{rq=await api("/rest/v1/pengajuan?select=id,nama,hp,email,user_id,barang,dp,status,created_at&order=created_at.desc");rqErr=""}
+catch(e){rqErr=/PGRST205|pengajuan/.test(e.message)?"Tabel pengajuan belum dibuat di Supabase. Jalankan setup-pengajuan.sql terlebih dahulu.":"Gagal memuat pengajuan: "+e.message}
+renderReq()}
+function renderReq(){
+var nb=rq.filter(function(r){return r.status==="baru"}).length;$("cnt4").textContent=nb||"";
+var f=$("rf").value,l=rq.filter(function(r){return f==="all"||r.status==="baru"});
+$("rq").innerHTML=rqErr?'<div class=em>'+esc(rqErr)+'</div>':l.length?l.map(function(r){var id=+r.id,
+bs=r.status==="disetujui"?'<span class="bd l">Disetujui</span>':r.status==="ditolak"?'<span class="bd late">Ditolak</span>':'<span class="bd today">Baru</span>',
+ts=r.created_at?new Date(r.created_at):null;
+return '<div class=rl><span class=ava>'+esc((r.nama||"?").charAt(0).toUpperCase())+'</span><div class=i><b>'+esc(r.nama)+'</b> '+bs+'<small>'+esc(r.barang)+' • DP '+rp(r.dp)+' • '+(ts?fmD(ts):"-")+(r.hp?' • '+esc(r.hp):'')+(r.email?' • '+esc(r.email):'')+(r.user_id?' • 🔗 akun':'')+'</small></div>'+
+'<button onclick=ktp('+id+')>🪪 KTP</button>'+(r.status==="baru"?'<button class=p onclick=proc('+id+')>✓ Proses</button><button onclick=tolak('+id+')>Tolak</button>':'')+'<button style="color:var(--wr)" onclick=delR('+id+')>Hapus</button></div>'}).join(""):'<div class=em>'+(f==="all"?"Belum ada pengajuan.":"Tidak ada pengajuan baru. 🎉")+'</div>'}
+function reqById(id){return rq.find(function(r){return +r.id===id})}
+async function ktp(id){var r=reqById(id);if(!r)return;$("kvt").textContent="KTP — "+r.nama;$("kvb").innerHTML='<div class=em>Memuat…</div>';$("kv").showModal();
+try{var d=await api("/rest/v1/pengajuan?id=eq."+id+"&select=ktp"),v=d&&d[0]&&d[0].ktp;
+if(!v||!/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(v))throw new Error("Foto KTP tidak tersedia");
+var im=document.createElement("img");im.src=v;im.alt="Foto KTP "+r.nama;im.style.cssText="width:100%;border-radius:14px";$("kvb").innerHTML="";$("kvb").appendChild(im)}
+catch(e){$("kvb").innerHTML='<div class=em>'+esc(e.message)+'</div>'}}
+$("kvx").onclick=function(){$("kv").close()};
+function proc(id){var r=reqById(id);if(!r)return;openF(null);fromReq=id;popU(r.user_id);
+$("dt").textContent="Proses Pengajuan";$("fn").value=r.nama;$("fk").value=r.barang;$("fh").value=r.hp||"";$("fd").value=r.dp||"";pv();$("dl").showModal()}
+async function markReq(id,st){try{await api("/rest/v1/pengajuan?id=eq."+id,"PATCH",{status:st},{Prefer:"return=minimal"});var r=reqById(id);if(r)r.status=st;renderReq()}
+catch(e){alert("Status pengajuan gagal diperbarui: "+e.message)}}
+function tolak(id){var r=reqById(id);if(r&&confirm("Tolak pengajuan dari "+r.nama+"?"))markReq(id,"ditolak")}
+async function delR(id){var r=reqById(id);if(!r||!confirm("Hapus pengajuan dari "+r.nama+" beserta foto KTP-nya?"))return;
+try{await api("/rest/v1/pengajuan?id=eq."+id,"DELETE");rq=rq.filter(function(x){return +x.id!==id});renderReq()}catch(e){alert("Gagal menghapus: "+e.message)}}
+$("rf").onchange=renderReq;$("rr").onclick=loadReq;
+setInterval(function(){if(sess&&$("lg").style.display==="none"&&$("ka").style.display==="none"){loadReq();loadPay()}},30000);
+
+/* ===== v2: akun kreditur, bukti bayar + ACC admin, notifikasi ===== */
+var VAPID_PUBLIC="";/* isi dengan VAPID public key (lihat kirim-pengingat.ts) */
+var pb=[],pbErr="",prof=[],kpb=[],kpj=[],payFor=null,xbData="";
+function clearS(){sess=null;try{localStorage.removeItem(SK)}catch(e){}}
+async function isAdm(){try{return(await api("/rest/v1/rpc/is_admin","POST",{}))===true}catch(e){if(sess)throw new Error("Database belum siap. Jalankan setup-v2.sql di Supabase.");throw e}}
+function myMeta(){return(sess&&sess.user&&sess.user.user_metadata)||{}}
+function readImg(f,ok,bad){if(!/^image\//.test(f.type)){bad("Berkas harus berupa foto.");return}var img=new Image(),u=URL.createObjectURL(f);
+img.onload=function(){var M=1100,r=Math.min(1,M/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.72))};
+img.onerror=function(){URL.revokeObjectURL(u);bad("Foto tidak bisa dibaca.")};img.src=u}
+function popU(sel){var h='<option value="">— tidak ditautkan —</option>',has=false;prof.forEach(function(p){if(p.id===sel)has=true;h+='<option value="'+esc(p.id)+'"'+(p.id===sel?' selected':'')+'>'+esc(p.nama||p.email)+' ('+esc(p.email)+')</option>'});if(sel&&!has)h+='<option value="'+esc(sel)+'" selected>(akun tertaut)</option>';$("fu").innerHTML=h}
+async function loadProf(){try{prof=await api("/rest/v1/profiles?select=id,nama,email,hp&order=nama")}catch(e){prof=[]}}
+function stBd(st){return st==="disetujui"?'<span class="bd l">Disetujui</span>':st==="ditolak"?'<span class="bd late">Ditolak</span>':'<span class="bd today">'+(st==="baru"?"Diperiksa":"Menunggu")+'</span>'}
+
+/* --- kreditur login --- */
+$("cb").onclick=async function(){$("cm").textContent="Masuk…";
+try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("ce").value.trim(),password:$("cw").value})}),j=await r.json();
+if(!r.ok){var em=j.msg||j.error_description||"";throw new Error(/not confirmed/i.test(em)?"Email belum dikonfirmasi. Cek email Anda.":"Email atau password salah")}
+setS(j);if(await isAdm()){clearS();throw new Error("Ini akun admin. Gunakan menu Admin.")}
+$("cw").value="";$("cm").textContent="";await enterK()}catch(x){$("cm").textContent=x.message}};
+$("cw").onkeydown=function(e){if(e.key==="Enter")$("cb").click()};
+async function submitPend(){var p=PEND;if(!p){try{p=JSON.parse(localStorage.getItem("kredit_pend")||"null")}catch(e){}}
+if(!p||!sess||!sess.user||(sess.user.email||"").toLowerCase()!==String(p.email).toLowerCase())return;
+try{await api("/rest/v1/pengajuan","POST",{nama:p.nama,hp:p.hp,email:p.email,barang:p.barang,dp:p.dp,ktp:p.ktp,user_id:sess.user.id},{Prefer:"return=minimal"});PEND=null;try{localStorage.removeItem("kredit_pend")}catch(e){}}
+catch(e){alert("Pengajuan belum terkirim, akan dicoba lagi saat Anda masuk berikutnya. "+e.message)}}
+async function enterK(){document.querySelector(".app").style.display="none";$("lg").style.display="none";$("ka").style.display="";await submitPend();await loadK()}
+$("klo").onclick=function(){showLogin();data=[];kpb=[];kpj=[]};
+
+/* --- kreditur: data & tampilan --- */
+async function loadK(){try{var r=await Promise.all([api("/rest/v1/kredit_saya?select=*&order=id"),api("/rest/v1/pembayaran?select=id,kredit_id,jumlah,tgl,status,catatan,created_at&order=created_at.desc"),api("/rest/v1/pengajuan?select=id,barang,dp,status,created_at&order=created_at.desc")]);
+data=r[0].map(fromRow);kpb=r[1];kpj=r[2];renderK()}catch(e){$("kcr").innerHTML='<div class="c em">Gagal memuat data: '+esc(e.message)+'</div>'}}
+function kCard(x){var tot=x.angs*x.bulan,sis=x.angs*x.sisa,pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0,n=x.bulan-x.sisa+1,
+w=kpb.filter(function(p){return +p.kredit_id===x.id&&p.status==="menunggu"}).length,act=x.sisa>0&&!x.tanda;
+return '<div class=c style="margin-bottom:14px"><div class=ch><b>'+esc(x.ket||"Kredit")+'</b>'+bdg(x)+'</div><div class=pv>Mulai '+fmD(new Date(x.tgl+"T00:00:00"))+(x.dp?' • DP '+rp(x.dp):'')+'</div>'+
+(act?'<div class=kr><span>Angsuran berikutnya</span><b>ke-'+n+' / '+x.bulan+'</b></div><div class=kr><span>Jumlah</span><b>'+rp(x.angs)+'</b></div><div class=kr><span>Jatuh tempo</span><b>'+fmD(nd(x))+'</b></div>':'')+
+'<div class=kr><span>Sudah dibayar</span><b>'+rp(tot-sis)+'</b></div><div class=kr><span>Sisa tagihan</span><b>'+rp(sis)+'</b></div><div class=pg style="margin:10px 0"><i style="width:'+pct+'%"></i></div>'+
+(w?'<div class=pv>⏳ '+w+' bukti bayar menunggu konfirmasi admin.</div>':'')+
+'<div style="display:flex;gap:8px;flex-wrap:wrap"><button onclick=riw('+x.id+')>Riwayat</button>'+(act?'<button class=p onclick=payK('+x.id+')>📷 Kirim bukti bayar</button>':'')+'</div></div>'}
+function renderK(){var m=myMeta();$("kh1").textContent="Halo, "+(m.nama||(sess&&sess.user&&sess.user.email)||"Kreditur");
+var soon=data.filter(function(x){return x.sisa>0&&!x.tanda&&dd(x)!==null&&dd(x)<=3});
+$("kbn").innerHTML=soon.map(function(x){var d=dd(x);return '<div class=bn style="margin-bottom:12px"><div><h3>⏰ '+(d<0?"Angsuran terlambat "+(-d)+" hari":d===0?"Angsuran jatuh tempo hari ini":"Angsuran jatuh tempo "+d+" hari lagi")+'</h3><p>'+esc(x.ket||"Kredit")+' • '+rp(x.angs)+' • '+fmD(nd(x))+'</p></div><button class=go onclick=payK('+x.id+') title="Kirim bukti bayar">›</button></div>'}).join("");
+$("kcr").innerHTML=data.length?data.map(kCard).join(""):'<div class="c em" style="margin-bottom:14px">Belum ada kredit aktif. Pengajuan Anda sedang diperiksa admin.</div>';
+$("kpb").innerHTML=kpb.length?kpb.map(function(p){var x=byId(+p.kredit_id);return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(x?x.ket||x.nama:"Kredit")+'</b> '+stBd(p.status)+'<small>'+p.jumlah+' bulan • dibayar '+dT(p.tgl)+(p.status==="ditolak"&&p.catatan?' • Alasan: '+esc(p.catatan):'')+'</small></div></div>'}).join(""):'<div class=em>Belum ada bukti bayar.</div>';
+$("kpj").innerHTML=kpj.length?kpj.map(function(p){return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(p.barang)+'</b> '+stBd(p.status)+'<small>DP '+rp(p.dp)+' • '+fmD(new Date(p.created_at))+'</small></div></div>'}).join(""):'<div class=em>Belum ada pengajuan.</div>'}
+
+/* --- kreditur: kirim bukti bayar --- */
+function payK(id){var x=byId(id);if(!x)return;payFor=id;xbData="";$("xbt").textContent="Bukti Bayar — "+(x.ket||x.nama);$("xbm").value=1;$("xbm").max=x.sisa;$("xbd").value=iso(new Date());$("xbf").value="";$("xbp").innerHTML="";$("xbn").textContent="";xbi();$("xb").showModal()}
+function xbi(){var x=byId(payFor);if(!x)return;var m=Math.min(x.sisa,Math.max(1,+$("xbm").value||1));$("xbi").textContent="Angsuran "+rp(x.angs)+" × "+m+" bulan = "+rp(x.angs*m)}
+$("xbm").oninput=xbi;$("xbc").onclick=function(){$("xb").close()};
+$("xbf").onchange=function(){var f=this.files[0];xbData="";$("xbp").innerHTML="";if(!f)return;readImg(f,function(d){xbData=d;var im=document.createElement("img");im.src=d;im.alt="Pratinjau bukti bayar";$("xbp").appendChild(im);$("xbn").textContent=""},function(t){$("xbn").textContent=t;$("xbn").style.color="var(--wr)"})};
+$("xbs").onclick=async function(){var x=byId(payFor);if(!x)return;var m=Math.round(+$("xbm").value||0);
+function bad(t){$("xbn").textContent=t;$("xbn").style.color="var(--wr)"}
+if(m<1||m>x.sisa){bad("Jumlah bulan harus 1 sampai "+x.sisa+".");return}if(!$("xbd").value){bad("Isi tanggal bayar.");return}if(!xbData){bad("Foto bukti bayar wajib diunggah.");return}
+var btn=this;btn.disabled=true;$("xbn").style.color="var(--mu)";$("xbn").textContent="Mengirim…";
+try{await api("/rest/v1/pembayaran","POST",{kredit_id:x.id,jumlah:m,tgl:$("xbd").value,foto:xbData},{Prefer:"return=minimal"});$("xb").close();await loadK();alert("Bukti bayar terkirim. Angsuran akan diperbarui setelah admin mengonfirmasi.")}
+catch(e){bad("Gagal mengirim. Periksa koneksi lalu coba lagi.")}btn.disabled=false};
+
+/* --- kreditur: ajukan kredit baru --- */
+$("knew").onclick=function(){$("xnb").value="";$("xnd").value="";$("xnm").textContent="";$("xn").showModal()};
+$("xnc").onclick=function(){$("xn").close()};
+$("xns").onclick=async function(){var b=$("xnb").value.trim(),d=$("xnd").value,e=$("xnm");e.style.color="var(--wr)";
+if(!b){e.textContent="Isi barang yang ingin dikredit.";return}if(d===""||+d<0){e.textContent="Isi DP (tulis 0 jika tanpa DP).";return}
+var btn=this;btn.disabled=true;e.style.color="var(--mu)";e.textContent="Mengirim…";
+try{var k=await api("/rest/v1/pengajuan?select=ktp&ktp=not.is.null&order=created_at.desc&limit=1"),m=myMeta();
+await api("/rest/v1/pengajuan","POST",{nama:m.nama||sess.user.email,hp:m.hp||"",email:sess.user.email,barang:b,dp:Math.round(+d),ktp:k&&k[0]?k[0].ktp:null,user_id:sess.user.id},{Prefer:"return=minimal"});$("xn").close();await loadK()}
+catch(x){e.style.color="var(--wr)";e.textContent="Gagal mengirim. Coba lagi."}btn.disabled=false};
+
+/* --- notifikasi push --- */
+function u8(b){var p="=".repeat((4-b.length%4)%4),r=atob((b+p).replace(/-/g,"+").replace(/_/g,"/")),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a}
+$("kpush").onclick=async function(){
+if(!VAPID_PUBLIC){alert("Notifikasi belum diaktifkan oleh admin (kunci VAPID belum diisi).");return}
+if(!("serviceWorker" in navigator)||!("PushManager" in window)){alert("Browser ini belum mendukung notifikasi. Di iPhone: buka lewat Safari, pilih Bagikan → Tambah ke Layar Utama, lalu buka aplikasinya dari layar utama.");return}
+try{if(await Notification.requestPermission()!=="granted"){alert("Izin notifikasi ditolak. Aktifkan lewat pengaturan browser.");return}
+var reg=await navigator.serviceWorker.register("sw.js");await navigator.serviceWorker.ready;
+var sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUBLIC)});
+await api("/rest/v1/push_subs?on_conflict=endpoint","POST",{endpoint:sub.endpoint,sub:sub.toJSON()},{Prefer:"resolution=merge-duplicates,return=minimal"});
+this.textContent="🔔 Notifikasi aktif"}catch(e){alert("Gagal mengaktifkan notifikasi: "+e.message)}};
+
+/* --- admin: bukti bayar + ACC --- */
+async function loadPay(){if(!sess)return;try{pb=await api("/rest/v1/pembayaran?select=id,kredit_id,jumlah,tgl,status,catatan,created_at&order=created_at.desc");pbErr=""}
+catch(e){pbErr=/PGRST205|pembayaran/.test(e.message)?"Tabel pembayaran belum dibuat. Jalankan setup-v2.sql di Supabase.":"Gagal memuat bukti bayar: "+e.message}renderPay()}
+function pbById(id){return pb.find(function(r){return +r.id===id})}
+function renderPay(){var nw=pb.filter(function(r){return r.status==="menunggu"}).length;$("cnt5").textContent=nw||"";
+var f=$("yf").value,l=pb.filter(function(r){return f==="all"||r.status==="menunggu"});
+$("yl").innerHTML=pbErr?'<div class=em>'+esc(pbErr)+'</div>':l.length?l.map(function(r){var id=+r.id,x=byId(+r.kredit_id),m=x?Math.min(r.jumlah,Math.max(x.sisa,0)):r.jumlah;
+return '<div class=rl><span class=ava>'+esc(((x&&x.nama)||"?").charAt(0).toUpperCase())+'</span><div class=i><b>'+esc(x?x.nama:"(kredit dihapus)")+'</b> '+stBd(r.status)+'<small>'+esc(x?x.ket||"-":"-")+' • '+r.jumlah+' bulan'+(x?' = '+rp(x.angs*r.jumlah):'')+' • dibayar '+dT(r.tgl)+(r.catatan?' • '+esc(r.catatan):'')+'</small></div><button onclick=foto('+id+')>🧾 Foto</button>'+
+(r.status==="menunggu"?'<button class=p onclick=accP('+id+')>✓ ACC</button><button onclick=tolakP('+id+')>Tolak</button>':'')+'<button style="color:var(--wr)" onclick=delP('+id+')>Hapus</button></div>'}).join(""):'<div class=em>'+(f==="all"?"Belum ada bukti bayar.":"Tidak ada bukti bayar yang menunggu. 🎉")+'</div>'}
+async function foto(id){var r=pbById(id),x=r&&byId(+r.kredit_id);$("kvt").textContent="Bukti bayar — "+(x?x.nama:"");$("kvb").innerHTML='<div class=em>Memuat…</div>';$("kv").showModal();
+try{var d=await api("/rest/v1/pembayaran?id=eq."+id+"&select=foto"),v=d&&d[0]&&d[0].foto;if(!v||!/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(v))throw new Error("Foto tidak tersedia");
+var im=document.createElement("img");im.src=v;im.alt="Bukti bayar";im.style.cssText="width:100%;border-radius:14px";$("kvb").innerHTML="";$("kvb").appendChild(im)}catch(e){$("kvb").innerHTML='<div class=em>'+esc(e.message)+'</div>'}}
+async function markPay(id,st,cat){try{var d=await api("/rest/v1/pembayaran?id=eq."+id+"&status=eq.menunggu","PATCH",{status:st,catatan:cat||""},{Prefer:"return=representation"});
+if(!d||!d.length){alert("Bukti bayar ini sudah diproses sebelumnya.");await loadPay();return false}var r=pbById(id);if(r){r.status=st;r.catatan=cat||""}return true}
+catch(e){alert("Gagal memperbarui status: "+e.message);return false}}
+async function accP(id){var r=pbById(id),x=r&&byId(+r.kredit_id);if(!x){alert("Data kredit tidak ditemukan.");return}if(x.sisa<=0){alert("Kredit ini sudah lunas.");return}
+var m=Math.min(x.sisa,Math.max(1,r.jumlah));if(!confirm("ACC pembayaran "+x.nama+" — "+m+" bulan ("+rp(x.angs*m)+")?\nSisa bulan: "+x.sisa+" → "+(x.sisa-m)))return;
+if(!await markPay(id,"disetujui"))return;
+x.sisa-=m;x.bayar=x.bayar||[];for(var i=0;i<m;i++)x.bayar.push(r.tgl);save();render()}
+async function tolakP(id){var c=prompt("Alasan penolakan (opsional):");if(c===null)return;if(await markPay(id,"ditolak",c))renderPay()}
+async function delP(id){if(!confirm("Hapus bukti bayar ini beserta fotonya?"))return;try{await api("/rest/v1/pembayaran?id=eq."+id,"DELETE");pb=pb.filter(function(r){return +r.id!==id});renderPay()}catch(e){alert("Gagal menghapus: "+e.message)}}
+$("yf").onchange=renderPay;$("yr").onclick=loadPay;
 render();
-try{var s0=localStorage.getItem(SK);if(s0){sess=JSON.parse(s0);$("lg").style.display="none";load()}}catch(e){}
+(async function(){try{var s0=localStorage.getItem(SK);if(!s0)return;sess=JSON.parse(s0);$("lg").style.display="none";if(await isAdm())await load();else await enterK()}catch(e){$("lg").style.display="flex"}})();
 </script>
 </body>
 </html>

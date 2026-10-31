@@ -138,6 +138,23 @@ td.a button{min-height:38px;margin-bottom:4px}
 #v3 tbody td:nth-child(7)::before{content:"Bayar Terakhir"}
 #v3 tbody td:nth-child(8)::before{content:"Progres"}
 #v3 tbody td:nth-child(9)::before{content:"";display:none}
+#bgfx{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+#bgfx span{position:absolute;line-height:1;opacity:.6;will-change:transform}
+#bgfx .rd{left:0;right:0;bottom:0;height:96px;background:rgba(93,107,125,.28);opacity:1}
+#bgfx .rd:before{content:"";position:absolute;left:0;right:0;top:46px;border-top:3px dashed rgba(255,255,255,.4)}
+#bgfx .m{left:0;top:0;animation:bgfall linear infinite}
+@keyframes bgfall{from{transform:translateY(-12vh) rotate(0)}to{transform:translateY(112vh) rotate(360deg)}}
+#bgfx .r{left:0;animation:bgr linear infinite}#bgfx .l{left:0;animation:bgl linear infinite}
+@keyframes bgr{from{transform:translateX(-25vw) scaleX(-1)}to{transform:translateX(125vw) scaleX(-1)}}
+@keyframes bgl{from{transform:translateX(125vw)}to{transform:translateX(-25vw)}}
+#bgfx .p{animation:bgfloat ease-in-out infinite alternate}
+@keyframes bgfloat{from{transform:translate(0,0) rotate(-10deg)}to{transform:translate(34px,-46px) rotate(10deg)}}
+#lg>.c{position:relative;z-index:1;background:color-mix(in srgb,var(--card) 78%,transparent);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.steps{margin:16px 0 0;padding:12px 14px 12px 34px;border-radius:16px;background:rgba(85,187,255,.13);font-size:13px;line-height:1.55;color:var(--mu)}
+.steps h3{margin:0 0 6px;font-size:14px;color:inherit;margin-left:-20px}.steps b{color:inherit;font-weight:700}
+.welcome{font-size:26px;margin:0;animation:up .8s both}.wsub{font-size:18px;font-weight:700;color:var(--pr);margin:2px 0 10px;animation:up .8s .3s both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.welcome,.wsub{animation:none!important}}
 .rolegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .role{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border-radius:22px;padding:18px;border:2px solid var(--br);background:var(--card);min-height:150px}
 .role .ic{font-size:30px;margin-bottom:6px}.role b{font-size:17px}.role small{color:var(--mu);line-height:1.35}
@@ -214,18 +231,28 @@ td.a button{min-height:38px;margin-bottom:4px}
 <div class="c"><h2>Pengajuan kredit saya</h2><div id="kpj"></div></div>
 </div></div>
 
-<div id="lg" style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;padding:16px;overflow:auto"><div class="c" style="width:min(440px,100%);margin:auto">
+<div id="lg" style="position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;padding:16px;overflow:auto"><div id="bgfx" aria-hidden="true"></div><div class="c" style="width:min(440px,100%);margin:auto">
 <div id="s0">
-<h2 style="font-size:22px">Pencatat Kredit</h2>
+<h2 class="welcome">Selamat Datang 👋</h2>
+<div class="wsub">Selamat Menabung 💰</div>
+<div class="pv" id="s0n" role="status" style="color:var(--wr);margin:0 0 6px"></div>
 <div class="pv" style="margin-bottom:0">Anda masuk sebagai siapa?</div>
 <div class="rolegrid">
 <button class="role adm" id="ra"><span class="ic">🔐</span><b>Admin</b><small>Kelola data kredit dan pembayaran</small></button>
 <button class="role" id="rk"><span class="ic">🛍️</span><b>Kreditur</b><small>Ajukan kredit baru</small></button>
 </div>
+<ol class="steps"><h3>📝 Cara daftar jadi kreditur</h3>
+<li>Pilih <b>Kreditur</b>, lalu tekan <b>Daftar &amp; ajukan kredit</b>.</li>
+<li>Isi nama, email, password, nomor WhatsApp, dan foto KTP.</li>
+<li>Tulis barang yang ingin dikredit dan jumlah DP, lalu kirim.</li>
+<li>Pengajuan Anda diproses, lalu Anda dihubungi lewat WhatsApp.</li>
+<li>Masuk dengan email dan password untuk melihat angsuran, kirim bukti bayar, dan menerima pengingat.</li>
+</ol>
 </div>
 <div id="s1" style="display:none">
 <button class="back" id="ab">‹ Kembali</button>
 <h2>🔐 Masuk Admin</h2><div class="f" style="margin-top:10px"><label>Email</label><input id="le" type="email"></div><div class="f"><label>Password</label><input id="lp" type="password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button>
+<div style="text-align:center;margin-top:10px"><button class="lk" id="pwl1">Lupa password?</button></div>
 </div>
 <div id="s2" style="display:none">
 <button class="back" id="kback">‹ Kembali</button>
@@ -233,7 +260,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 <div class="pv">Buat akun untuk memantau angsuran dan mengirim bukti bayar. Foto KTP hanya bisa dilihat admin.</div>
 <div class="f"><label for="kn">Nama lengkap</label><input id="kn" autocomplete="name"></div>
 <div class="g2"><div class="f"><label for="ke">Email</label><input id="ke" type="email" autocomplete="email"></div><div class="f"><label for="kw">Password (min. 6)</label><input id="kw" type="password" autocomplete="new-password"></div></div>
-<div class="f"><label for="kh">No. WhatsApp (opsional)</label><input id="kh" inputmode="tel" autocomplete="tel" placeholder="08123456789"></div>
+<div class="f"><label for="kh">No. WhatsApp</label><input id="kh" required inputmode="tel" autocomplete="tel" placeholder="08123456789"></div>
 <div class="f"><label for="kf">Foto KTP</label><input id="kf" type="file" accept="image/*" style="width:100%;min-width:0"><div id="kp"></div></div>
 <div class="f"><label for="kb">Barang yang ingin dikredit</label><input id="kb" placeholder="mis. iPhone 13 128GB"></div>
 <div class="f"><label for="kd">DP (Rp) — isi 0 jika tanpa DP</label><input id="kd" type="number" min="0" inputmode="numeric"><div class="pv" id="kdp" style="margin:2px 0 0"></div></div>
@@ -248,9 +275,25 @@ td.a button{min-height:38px;margin-bottom:4px}
 <button class="back" id="cback">‹ Kembali</button>
 <h2>🛍️ Masuk Kreditur</h2><div class="f" style="margin-top:10px"><label for="ce">Email</label><input id="ce" type="email" autocomplete="email"></div><div class="f"><label for="cw">Password</label><input id="cw" type="password" autocomplete="current-password"></div><div class="pv" id="cm"></div>
 <button class="p" id="cb" style="width:100%">Masuk</button>
+<div style="text-align:center;margin-top:8px"><button class="lk" id="pwl2">Lupa password?</button></div>
 <div style="text-align:center;margin-top:12px" class="pv">Belum punya akun? <button class="lk" id="cr">Daftar &amp; ajukan kredit</button></div>
 </div>
+<div id="s5" style="display:none">
+<button class="back" id="pwbk">‹ Kembali</button>
+<h2>🔑 Lupa Password</h2><div class="pv">Masukkan email akun Anda. Kami kirim tautan ke email untuk membuat password baru.</div>
+<div class="f"><label for="pwe">Email</label><input id="pwe" type="email" autocomplete="email"></div>
+<div class="pv" id="pwm" role="status"></div>
+<button class="p" id="pwb" style="width:100%">Kirim tautan ke email</button>
+</div>
+<div id="s6" style="display:none">
+<h2>🔑 Buat Password Baru</h2><div class="pv">Masukkan password baru untuk akun Anda.</div>
+<div class="f"><label for="pwn1">Password baru (min. 6)</label><input id="pwn1" type="password" autocomplete="new-password"></div>
+<div class="f"><label for="pwn2">Ulangi password baru</label><input id="pwn2" type="password" autocomplete="new-password"></div>
+<div class="pv" id="pwm2" role="status"></div>
+<button class="p" id="pwb2" style="width:100%">Simpan password</button>
+</div>
 </div></div>
+<dialog id="rmd"><h3 style="margin-top:0">⏰ Pengingat Pembayaran</h3><div id="rmb"></div><div style="display:flex;justify-content:flex-end;margin-top:10px"><button id="rmc">Nanti</button></div></dialog>
 <dialog id="xb">
 <h3 id="xbt" style="margin-top:0">Kirim Bukti Pembayaran</h3>
 <div class="g2"><div class="f"><label for="xbm">Jumlah bulan dibayar</label><input id="xbm" type="number" min="1" value="1"></div><div class="f"><label for="xbd">Tanggal bayar</label><input id="xbd" type="date"></div></div>
@@ -464,7 +507,7 @@ svF("kredit.csv","\ufeff"+l.join("\n"))};
 var SB="https://cjticmrfcuivoiyffssg.supabase.co",KEYP="sb_publishable_JQy4qmZyayz4zdyc-McMJg_09uBcUA5",SK="kredit_sb_session",sess=null,srv=[],tm=null;
 function ss(t,c){var e=$("sync");e.textContent=t;e.style.color=c||"var(--mu)"}
 function setS(s){sess=s;try{localStorage.setItem(SK,JSON.stringify(s))}catch(e){}}
-function showLogin(){sess=null;try{localStorage.removeItem(SK)}catch(e){}pane(0);document.querySelector(".app").style.display="";$("ka").style.display="none";$("lg").style.display="flex"}
+function showLogin(){sess=null;try{localStorage.removeItem(SK)}catch(e){}ADM=false;try{localStorage.removeItem(LK)}catch(e){}pane(0);document.querySelector(".app").style.display="";$("ka").style.display="none";$("lg").style.display="flex"}
 async function refresh(){try{var r=await fetch(SB+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:sess.refresh_token})});if(!r.ok)return false;setS(await r.json());return true}catch(e){return false}}
 async function api(p,m,body,extra,re){var h=Object.assign({apikey:KEYP,Authorization:"Bearer "+(sess?sess.access_token:KEYP)},body?{"Content-Type":"application/json"}:{},extra||{});
 var r=await fetch(SB+p,{method:m||"GET",headers:h,body:body?JSON.stringify(body):undefined});
@@ -478,14 +521,14 @@ async function push(){try{var cur=data.map(function(x){return x.id}),gone=srv.fi
 if(data.length)await api("/rest/v1/kredit?on_conflict=id","POST",data.map(toRow),{Prefer:"resolution=merge-duplicates,return=minimal"});
 if(gone.length)await api("/rest/v1/kredit?id=in.("+gone.join(",")+")","DELETE");
 srv=cur;ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ Gagal menyimpan: "+e.message,"var(--wr)")}}
-async function login(){$("lm").textContent="Masuk…";try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("le").value.trim(),password:$("lp").value})});var j=await r.json();if(!r.ok)throw new Error(j.msg||j.error_description||"Email atau password salah");setS(j);if(!await isAdm()){clearS();throw new Error("Akun ini bukan admin. Gunakan menu Kreditur.")}$("lp").value="";$("lm").textContent="";$("lg").style.display="none";await load()}catch(x){$("lm").textContent=x.message}}
+async function login(){$("lm").textContent="Masuk…";try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("le").value.trim(),password:$("lp").value})});var j=await r.json();if(!r.ok)throw new Error(j.msg||j.error_description||"Email atau password salah");setS(j);if(!await isAdm()){clearS();throw new Error("Akun ini bukan admin. Gunakan menu Kreditur.")}startAdm();$("lp").value="";$("lm").textContent="";$("lg").style.display="none";await load()}catch(x){$("lm").textContent=x.message}}
 $("lb").onclick=login;$("lp").onkeydown=function(e){if(e.key==="Enter")login()};
 $("lo").onclick=function(){showLogin();data=[];srv=[];rq=[];pb=[];prof=[];render();ss("")};
 $("imp").onchange=function(ev){var f=ev.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var a=JSON.parse(rd.result);if(!Array.isArray(a))throw 0;if(!confirm("Impor "+a.length+" data kredit?"))return;if(data.length&&confirm("Hapus data lama dulu?\nOK = ganti semua dengan isi file\nBatal = gabungkan (ID sama ditimpa)"))data=[];a.forEach(function(x,i){x.id=x.id||Date.now()+i;var o=byId(x.id);if(o)Object.assign(o,x);else data.push(x)});save();render()}catch(e){alert("File JSON tidak valid")}};rd.readAsText(f);ev.target.value=""};
 
 /* ===== Pengajuan kredit: pilih peran, form kreditur, daftar pengajuan admin ===== */
 var rq=[],rqErr="",fromReq=null,ktpData="",PEND=null;
-function pane(n){[0,1,2,3,4].forEach(function(i){$("s"+i).style.display=i===n?"":"none"})}
+function pane(n){[0,1,2,3,4,5,6].forEach(function(i){$("s"+i).style.display=i===n?"":"none"})}
 function km(t,bad){var e=$("km");e.textContent=t;e.style.color=bad?"var(--wr)":"var(--mu)"}
 $("ra").onclick=function(){pane(1);$("le").focus()};
 $("rk").onclick=function(){$("cm").textContent="";pane(4)};
@@ -507,6 +550,8 @@ var n=$("kn").value.trim(),e=$("ke").value.trim(),w=$("kw").value,b=$("kb").valu
 if(n.length<2){km("Nama wajib diisi.",1);return}
 if(!/^\S+@\S+\.\S+$/.test(e)){km("Isi email yang valid.",1);return}
 if(w.length<6){km("Password minimal 6 karakter.",1);return}
+if(!/^(\+?62|0)8\d{7,12}$/.test($("kh").value.replace(/[\s-]/g,""))){km("No. WhatsApp wajib diisi dengan benar, contoh 08123456789.",1);return}
+askNotif();
 if(!ktpData){km("Foto KTP wajib diunggah.",1);return}
 if(!b){km("Isi barang yang ingin dikredit.",1);return}
 if(d===""||+d<0){km("Isi DP (tulis 0 jika tanpa DP).",1);return}
@@ -560,10 +605,10 @@ img.onload=function(){var M=1100,r=Math.min(1,M/Math.max(img.width,img.height)),
 img.onerror=function(){URL.revokeObjectURL(u);bad("Foto tidak bisa dibaca.")};img.src=u}
 function popU(sel){var h='<option value="">— tidak ditautkan —</option>',has=false;prof.forEach(function(p){if(p.id===sel)has=true;h+='<option value="'+esc(p.id)+'"'+(p.id===sel?' selected':'')+'>'+esc(p.nama||p.email)+' ('+esc(p.email)+')</option>'});if(sel&&!has)h+='<option value="'+esc(sel)+'" selected>(akun tertaut)</option>';$("fu").innerHTML=h}
 async function loadProf(){try{prof=await api("/rest/v1/profiles?select=id,nama,email,hp&order=nama")}catch(e){prof=[]}}
-function stBd(st){return st==="disetujui"?'<span class="bd l">Disetujui</span>':st==="ditolak"?'<span class="bd late">Ditolak</span>':'<span class="bd today">'+(st==="baru"?"Diperiksa":"Menunggu")+'</span>'}
+function stBd(st,k){return st==="disetujui"?'<span class="bd l">Disetujui</span>':st==="ditolak"?'<span class="bd late">Ditolak</span>':'<span class="bd today">'+(k?"Diproses":st==="baru"?"Diperiksa":"Menunggu")+'</span>'}
 
 /* --- kreditur login --- */
-$("cb").onclick=async function(){$("cm").textContent="Masuk…";
+$("cb").onclick=async function(){askNotif();$("cm").textContent="Masuk…";
 try{var r=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:$("ce").value.trim(),password:$("cw").value})}),j=await r.json();
 if(!r.ok){var em=j.msg||j.error_description||"";throw new Error(/not confirmed/i.test(em)?"Email belum dikonfirmasi. Cek email Anda.":"Email atau password salah")}
 setS(j);if(await isAdm()){clearS();throw new Error("Ini akun admin. Gunakan menu Admin.")}
@@ -573,7 +618,10 @@ async function submitPend(){var p=PEND;if(!p){try{p=JSON.parse(localStorage.getI
 if(!p||!sess||!sess.user||(sess.user.email||"").toLowerCase()!==String(p.email).toLowerCase())return;
 try{await api("/rest/v1/pengajuan","POST",{nama:p.nama,hp:p.hp,email:p.email,barang:p.barang,dp:p.dp,ktp:p.ktp,user_id:sess.user.id},{Prefer:"return=minimal"});PEND=null;try{localStorage.removeItem("kredit_pend")}catch(e){}}
 catch(e){alert("Pengajuan belum terkirim, akan dicoba lagi saat Anda masuk berikutnya. "+e.message)}}
-async function enterK(){document.querySelector(".app").style.display="none";$("lg").style.display="none";$("ka").style.display="";await submitPend();await loadK()}
+async function enterK(){ADM=false;remShown=false;$("s0n").textContent="";document.querySelector(".app").style.display="none";$("lg").style.display="none";$("ka").style.display="";
+$("kpush").style.display=VAPID_PUBLIC?"":"none";try{navigator.serviceWorker&&navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
+await submitPend();await loadK();remind();
+if(VAPID_PUBLIC&&"Notification" in window&&Notification.permission==="granted")try{$("kpush").onclick.call($("kpush"))}catch(e){}}
 $("klo").onclick=function(){showLogin();data=[];kpb=[];kpj=[]};
 
 /* --- kreditur: data & tampilan --- */
@@ -584,14 +632,14 @@ w=kpb.filter(function(p){return +p.kredit_id===x.id&&p.status==="menunggu"}).len
 return '<div class=c style="margin-bottom:14px"><div class=ch><b>'+esc(x.ket||"Kredit")+'</b>'+bdg(x)+'</div><div class=pv>Mulai '+fmD(new Date(x.tgl+"T00:00:00"))+(x.dp?' • DP '+rp(x.dp):'')+'</div>'+
 (act?'<div class=kr><span>Angsuran berikutnya</span><b>ke-'+n+' / '+x.bulan+'</b></div><div class=kr><span>Jumlah</span><b>'+rp(x.angs)+'</b></div><div class=kr><span>Jatuh tempo</span><b>'+fmD(nd(x))+'</b></div>':'')+
 '<div class=kr><span>Sudah dibayar</span><b>'+rp(tot-sis)+'</b></div><div class=kr><span>Sisa tagihan</span><b>'+rp(sis)+'</b></div><div class=pg style="margin:10px 0"><i style="width:'+pct+'%"></i></div>'+
-(w?'<div class=pv>⏳ '+w+' bukti bayar menunggu konfirmasi admin.</div>':'')+
+(w?'<div class=pv>⏳ '+w+' bukti bayar sedang diproses.</div>':'')+
 '<div style="display:flex;gap:8px;flex-wrap:wrap"><button onclick=riw('+x.id+')>Riwayat</button>'+(act?'<button class=p onclick=payK('+x.id+')>📷 Kirim bukti bayar</button>':'')+'</div></div>'}
 function renderK(){var m=myMeta();$("kh1").textContent="Halo, "+(m.nama||(sess&&sess.user&&sess.user.email)||"Kreditur");
 var soon=data.filter(function(x){return x.sisa>0&&!x.tanda&&dd(x)!==null&&dd(x)<=3});
 $("kbn").innerHTML=soon.map(function(x){var d=dd(x);return '<div class=bn style="margin-bottom:12px"><div><h3>⏰ '+(d<0?"Angsuran terlambat "+(-d)+" hari":d===0?"Angsuran jatuh tempo hari ini":"Angsuran jatuh tempo "+d+" hari lagi")+'</h3><p>'+esc(x.ket||"Kredit")+' • '+rp(x.angs)+' • '+fmD(nd(x))+'</p></div><button class=go onclick=payK('+x.id+') title="Kirim bukti bayar">›</button></div>'}).join("");
-$("kcr").innerHTML=data.length?data.map(kCard).join(""):'<div class="c em" style="margin-bottom:14px">Belum ada kredit aktif. Pengajuan Anda sedang diperiksa admin.</div>';
-$("kpb").innerHTML=kpb.length?kpb.map(function(p){var x=byId(+p.kredit_id);return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(x?x.ket||x.nama:"Kredit")+'</b> '+stBd(p.status)+'<small>'+p.jumlah+' bulan • dibayar '+dT(p.tgl)+(p.status==="ditolak"&&p.catatan?' • Alasan: '+esc(p.catatan):'')+'</small></div></div>'}).join(""):'<div class=em>Belum ada bukti bayar.</div>';
-$("kpj").innerHTML=kpj.length?kpj.map(function(p){return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(p.barang)+'</b> '+stBd(p.status)+'<small>DP '+rp(p.dp)+' • '+fmD(new Date(p.created_at))+'</small></div></div>'}).join(""):'<div class=em>Belum ada pengajuan.</div>'}
+$("kcr").innerHTML=data.length?data.map(kCard).join(""):'<div class="c em" style="margin-bottom:14px">Belum ada kredit aktif. Pengajuan Anda sedang diproses.</div>';
+$("kpb").innerHTML=kpb.length?kpb.map(function(p){var x=byId(+p.kredit_id);return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(x?x.ket||x.nama:"Kredit")+'</b> '+stBd(p.status,1)+'<small>'+p.jumlah+' bulan • dibayar '+dT(p.tgl)+(p.status==="ditolak"&&p.catatan?' • Alasan: '+esc(p.catatan):'')+'</small></div></div>'}).join(""):'<div class=em>Belum ada bukti bayar.</div>';
+$("kpj").innerHTML=kpj.length?kpj.map(function(p){return '<div class=rl style="border-top:0;padding:7px 0"><div class=i><b>'+esc(p.barang)+'</b> '+stBd(p.status,1)+'<small>DP '+rp(p.dp)+' • '+fmD(new Date(p.created_at))+'</small></div></div>'}).join(""):'<div class=em>Belum ada pengajuan.</div>'}
 
 /* --- kreditur: kirim bukti bayar --- */
 function payK(id){var x=byId(id);if(!x)return;payFor=id;xbData="";$("xbt").textContent="Bukti Bayar — "+(x.ket||x.nama);$("xbm").value=1;$("xbm").max=x.sisa;$("xbd").value=iso(new Date());$("xbf").value="";$("xbp").innerHTML="";$("xbn").textContent="";xbi();$("xb").showModal()}
@@ -602,7 +650,7 @@ $("xbs").onclick=async function(){var x=byId(payFor);if(!x)return;var m=Math.rou
 function bad(t){$("xbn").textContent=t;$("xbn").style.color="var(--wr)"}
 if(m<1||m>x.sisa){bad("Jumlah bulan harus 1 sampai "+x.sisa+".");return}if(!$("xbd").value){bad("Isi tanggal bayar.");return}if(!xbData){bad("Foto bukti bayar wajib diunggah.");return}
 var btn=this;btn.disabled=true;$("xbn").style.color="var(--mu)";$("xbn").textContent="Mengirim…";
-try{await api("/rest/v1/pembayaran","POST",{kredit_id:x.id,jumlah:m,tgl:$("xbd").value,foto:xbData},{Prefer:"return=minimal"});$("xb").close();await loadK();alert("Bukti bayar terkirim. Angsuran akan diperbarui setelah admin mengonfirmasi.")}
+try{await api("/rest/v1/pembayaran","POST",{kredit_id:x.id,jumlah:m,tgl:$("xbd").value,foto:xbData},{Prefer:"return=minimal"});$("xb").close();await loadK();alert("Bukti bayar terkirim dan sedang diproses. Angsuran akan diperbarui otomatis.")}
 catch(e){bad("Gagal mengirim. Periksa koneksi lalu coba lagi.")}btn.disabled=false};
 
 /* --- kreditur: ajukan kredit baru --- */
@@ -648,8 +696,56 @@ x.sisa-=m;x.bayar=x.bayar||[];for(var i=0;i<m;i++)x.bayar.push(r.tgl);save();ren
 async function tolakP(id){var c=prompt("Alasan penolakan (opsional):");if(c===null)return;if(await markPay(id,"ditolak",c))renderPay()}
 async function delP(id){if(!confirm("Hapus bukti bayar ini beserta fotonya?"))return;try{await api("/rest/v1/pembayaran?id=eq."+id,"DELETE");pb=pb.filter(function(r){return +r.id!==id});renderPay()}catch(e){alert("Gagal menghapus: "+e.message)}}
 $("yf").onchange=renderPay;$("yr").onclick=loadPay;
+
+/* ===== v3: auto-logout admin, pengingat otomatis saat masuk ===== */
+var IDLE=30*60*1000,LK="kredit_last",ADM=false,lastAct=Date.now(),remShown=false;
+function idleNote(){$("s0n").style.color="var(--wr)";$("s0n").textContent="Sesi admin berakhir karena tidak aktif 30 menit. Silakan masuk kembali."}
+function startAdm(){ADM=true;$("s0n").textContent="";lastAct=Date.now();try{localStorage.setItem(LK,lastAct)}catch(e){}}
+function actv(){if(!ADM)return;var n=Date.now();if(n-lastAct>5000){lastAct=n;try{localStorage.setItem(LK,n)}catch(e){}}}
+["click","keydown","touchstart","pointerdown","scroll"].forEach(function(ev){addEventListener(ev,actv,{passive:true,capture:true})});
+function idleChk(){if(!ADM)return;var o=0;try{o=+localStorage.getItem(LK)||0}catch(e){}if(Date.now()-Math.max(lastAct,o)>IDLE){$("lo").onclick();idleNote()}}
+setInterval(idleChk,30000);document.addEventListener("visibilitychange",idleChk);addEventListener("focus",idleChk);
+function askNotif(){try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission()}catch(e){}}
+function dMsg(d){return d<0?"terlambat "+(-d)+" hari":d===0?"jatuh tempo hari ini":"jatuh tempo "+d+" hari lagi"}
+async function sysNote(t,b){try{if(!("Notification" in window)||Notification.permission!=="granted")return;var reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(reg)reg.showNotification(t,{body:b,tag:"pengingat"});else new Notification(t,{body:b,tag:"pengingat"})}catch(e){}}
+function remind(){if(remShown)return;var l=data.filter(function(x){return x.sisa>0&&!x.tanda&&dd(x)!==null&&dd(x)<=3&&!kpb.some(function(p){return +p.kredit_id===x.id&&p.status==="menunggu"})});if(!l.length)return;remShown=true;
+$("rmb").innerHTML=l.map(function(x){return '<div class=rl style="border-top:0;padding:8px 0"><div class=i><b>'+esc(x.ket||"Kredit")+'</b><small>Angsuran ke-'+(x.bulan-x.sisa+1)+'/'+x.bulan+' • '+rp(x.angs)+' • '+dMsg(dd(x))+' ('+fmD(nd(x))+')</small></div><button class=p onclick="$(\'rmd\').close();payK('+x.id+')">Bayar</button></div>'}).join("");
+$("rmd").showModal();var f=l[0];sysNote("Pengingat angsuran",(f.ket||"Kredit")+": "+rp(f.angs)+" "+dMsg(dd(f))+(l.length>1?" (+"+(l.length-1)+" lainnya)":""))}
+$("rmc").onclick=function(){$("rmd").close()};
+
+/* ===== v4: lupa password + animasi latar ===== */
+var RECT=null,REDIR=location.origin+location.pathname;
+$("pwl1").onclick=$("pwl2").onclick=function(){$("pwm").textContent="";$("pwe").value=$("ce").value||$("le").value||"";pane(5)};
+$("pwbk").onclick=function(){pane(4)};
+$("pwb").onclick=async function(){var e=$("pwe").value.trim(),m=$("pwm");m.style.color="var(--wr)";
+if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Isi email yang valid.";return}
+var btn=this;btn.disabled=true;m.style.color="var(--mu)";m.textContent="Mengirim…";
+try{var r=await fetch(SB+"/auth/v1/recover?redirect_to="+encodeURIComponent(REDIR),{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:e})});
+if(r.status===429)throw new Error("Terlalu sering meminta. Coba lagi beberapa menit lagi.");
+if(!r.ok)throw new Error("Gagal mengirim email. Coba lagi.");
+m.textContent="Jika email terdaftar, tautan ganti password sudah dikirim. Cek inbox dan folder spam, lalu klik tautannya."}
+catch(x){m.style.color="var(--wr)";m.textContent=x.message}btn.disabled=false};
+function recovery(){var h=location.hash.replace(/^#/,"");if(!h)return false;var q=new URLSearchParams(h);
+if(q.get("type")==="recovery"&&q.get("access_token")){RECT=q.get("access_token");history.replaceState(null,"",location.pathname+location.search);clearS();$("lg").style.display="flex";$("pwm2").textContent="";pane(6);return true}
+if(q.get("error")){history.replaceState(null,"",location.pathname+location.search);$("lg").style.display="flex";pane(5);$("pwm").style.color="var(--wr)";$("pwm").textContent="Tautan sudah kadaluarsa atau tidak valid. Minta tautan baru di bawah.";return true}
+return false}
+$("pwb2").onclick=async function(){var a=$("pwn1").value,b=$("pwn2").value,m=$("pwm2");m.style.color="var(--wr)";
+if(a.length<6){m.textContent="Password minimal 6 karakter.";return}if(a!==b){m.textContent="Konfirmasi password tidak sama.";return}if(!RECT){m.textContent="Tautan tidak valid. Minta tautan baru.";return}
+var btn=this;btn.disabled=true;m.style.color="var(--mu)";m.textContent="Menyimpan…";
+try{var r=await fetch(SB+"/auth/v1/user",{method:"PUT",headers:{apikey:KEYP,Authorization:"Bearer "+RECT,"Content-Type":"application/json"},body:JSON.stringify({password:a})}),j={};try{j=await r.json()}catch(e){}
+if(!r.ok){var em=j.msg||j.message||j.error_description||"";throw new Error(/different|same/i.test(em)?"Password baru harus berbeda dari yang lama.":(r.status===401||/expired|invalid|jwt/i.test(em))?"Tautan sudah kadaluarsa. Minta tautan baru.":em||"Gagal mengganti password")}
+RECT=null;$("pwn1").value="";$("pwn2").value="";$("s0n").style.color="var(--ok)";$("s0n").textContent="✅ Password berhasil diganti. Pilih Admin atau Kreditur, lalu masuk dengan password baru.";pane(0)}
+catch(x){m.style.color="var(--wr)";m.textContent=x.message}btn.disabled=false};
+(function(){var bg=$("bgfx");if(!bg||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))return;
+var h='<span class=rd></span>',M=["💵","🪙","💰","💸","🪙","💵"],i;
+for(i=0;i<18;i++)h+='<span class=m style="left:'+((i*37)%94+2)+'%;font-size:'+(18+(i*5)%16)+'px;animation-duration:'+(8+(i*13)%8)+'s;animation-delay:-'+((i*1.9)%14).toFixed(1)+'s">'+M[i%6]+'</span>';
+[["🚗","r",44,36,12,-3],["🏍️","l",10,30,8,-2],["🛵","r",10,30,14,-8],["🚙","l",44,36,16,-10],["🚕","r",44,36,18,-14]].forEach(function(v){h+='<span class='+v[1]+' style="bottom:'+v[2]+'px;font-size:'+v[3]+'px;animation-duration:'+v[4]+'s;animation-delay:'+v[5]+'s">'+v[0]+'</span>'});
+[[8,18,40,5,0],[78,30,46,6,-2],[42,60,34,7,-4],[16,70,38,6,-1],[84,66,34,5,-3]].forEach(function(v){h+='<span class=p style="left:'+v[0]+'%;top:'+v[1]+'%;font-size:'+v[2]+'px;animation-duration:'+v[3]+'s;animation-delay:'+v[4]+'s">📱</span>'});
+bg.innerHTML=h})();
 render();
-(async function(){try{var s0=localStorage.getItem(SK);if(!s0)return;sess=JSON.parse(s0);$("lg").style.display="none";if(await isAdm())await load();else await enterK()}catch(e){$("lg").style.display="flex"}})();
+(async function(){try{if(recovery())return;var s0=localStorage.getItem(SK);if(!s0)return;var la=+localStorage.getItem(LK)||0;
+if(la&&Date.now()-la>IDLE){clearS();try{localStorage.removeItem(LK)}catch(e){}idleNote();return}
+sess=JSON.parse(s0);$("lg").style.display="none";if(await isAdm()){startAdm();await load()}else await enterK()}catch(e){$("lg").style.display="flex"}})();
 </script>
 </body>
 </html>

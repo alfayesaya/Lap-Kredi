@@ -46,6 +46,9 @@ button{border-radius:99px;cursor:pointer;padding:9px 16px}
 .bars .gl{position:absolute;left:44px;right:0;top:0;bottom:20px;pointer-events:none}
 .gl i{position:absolute;left:0;right:0;border-top:1px dashed var(--br)}
 .gr .bw i{background:var(--ok)}
+.pj .bw i{opacity:.4}
+.rg2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+@media(max-width:760px){.rg2{grid-template-columns:1fr}}
 .b{position:relative;z-index:1;flex:1;height:100%;display:flex;flex-direction:column;font-size:11px;color:var(--mu);text-align:center;min-width:0}
 .bw{flex:1;display:flex;align-items:flex-end}
 .bw i{display:block;width:100%;border-radius:12px;background:var(--bar);min-height:5px}
@@ -145,7 +148,8 @@ td.a button{min-height:38px;margin-bottom:4px}
 #v3 tbody td:nth-child(7)::before{content:"Bayar Terakhir"}
 #v3 tbody td:nth-child(8)::before{content:"Progres"}
 #v3 tbody td:nth-child(9)::before{content:"";display:none}
-#ixr td:nth-child(2)::before{content:"Untung Kredit"}#ixr td:nth-child(3)::before{content:"Untung Pendapatan"}#ixr td:nth-child(4)::before{content:"Total"}
+#ixr td:nth-child(2)::before{content:"Uang Masuk"}#ixr td:nth-child(3)::before{content:"Untung Kredit"}#ixr td:nth-child(4)::before{content:"Untung Pendapatan"}#ixr td:nth-child(5)::before{content:"Total Untung"}
+#lmb td:nth-child(2)::before{content:"Keterangan"}#lmb td:nth-child(3)::before{content:"Angsuran/bln"}#lmb td:nth-child(4)::before{content:"Progres"}#lmb td:nth-child(5)::before{content:"Sisa"}#lmb td:nth-child(6)::before{content:"Estimasi Selesai"}#lmb td:nth-child(7)::before{content:"Dasar Untung"}#lmb td:nth-child(8)::before{content:"Untung Total"}
 #ixl td:nth-child(2)::before{content:"Tgl Order"}#ixl td:nth-child(3)::before{content:"Tgl Payment"}#ixl td:nth-child(4)::before{content:"Modal"}#ixl td:nth-child(5)::before{content:"Profit"}#ixl td:nth-child(6)::before{content:"Harga Jual"}#ixl td:nth-child(7)::before{content:"";display:none}
 #ixr td:first-child,#ixl td:first-child{font-size:inherit}
 #cul td:nth-child(2)::before{content:"WhatsApp"}#cul td:nth-child(3)::before{content:"Pengajuan"}#cul td:nth-child(4)::before{content:"Kredit"}#cul td:nth-child(5)::before{content:"Sisa Tagihan"}#cul td:nth-child(6)::before{content:"Bukti Menunggu"}#cul td:nth-child(7)::before{content:"Terdaftar"}#cul td:nth-child(8)::before{content:"";display:none}
@@ -241,11 +245,17 @@ td.a button{min-height:38px;margin-bottom:4px}
 <div class="c" id="yl"></div>
 </div>
 <div id="v6" style="display:none">
-<div class="c" style="margin-bottom:16px"><div class="hd"><h2>📈 Rekap Keuntungan Bulanan</h2><label>Tahun <select id="ixy"></select></label></div>
-<div class="big" id="ixt"></div><div class="pv" id="ixn" style="margin:2px 0 0"></div>
-<div class="bars gr" id="ixb"></div>
-<div class="tw" style="margin-top:10px"><table><thead><tr><th>Bulan</th><th>Untung Kredit</th><th>Untung Pendapatan</th><th>Total</th></tr></thead><tbody id="ixr"></tbody><tfoot id="ixf"></tfoot></table></div>
-<div class="pv" style="margin-top:8px">Untung kredit dihitung proporsional dari uang yang masuk tiap bulan (DP dan angsuran × margin kredit tersebut). Untung pendapatan dihitung pada bulan tanggal payment.</div></div>
+<div class="c" style="margin-bottom:16px"><div class="hd"><h2>📈 Rekap Uang &amp; Keuntungan Bulanan</h2><label>Tahun <select id="ixy"></select></label></div>
+<div class="pv" style="margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">Kredit tanpa data modal: untung = <input id="rtv" type="number" min="0" step="0.1" style="width:84px"> % × angsuran per bulan</div>
+<div class="big" id="ixt"></div><div class="pv" id="ixs" style="margin:2px 0 0"></div><div class="pv" id="ixn" style="margin:2px 0 0"></div>
+<div class="rg2"><div><div class="pv" style="margin:0"><b>Uang masuk per bulan</b> (angsuran + DP)</div><div class="bars" id="ixc"></div></div><div><div class="pv" style="margin:0"><b>Untung per bulan</b> (kredit + pendapatan)</div><div class="bars gr" id="ixb"></div></div></div>
+<div class="pv" style="margin:6px 0 0">Batang pudar = proyeksi (angsuran yang belum dibayar sesuai jadwal).</div>
+<div class="tw" style="margin-top:10px"><table><thead><tr><th>Bulan</th><th>Uang Masuk</th><th>Untung Kredit</th><th>Untung Pendapatan</th><th>Total Untung</th></tr></thead><tbody id="ixr"></tbody><tfoot id="ixf"></tfoot></table></div>
+<div class="bar" style="margin-top:10px"><button class="p" id="rkx">📥 Ekspor Rekap &amp; Estimasi (Excel)</button><button id="rkc">Ekspor CSV</button></div>
+<div class="pv" style="margin-top:8px">Cara hitung untung kredit: (1) kredit yang ada data modalnya: untung total = DP + angsuran × tenor − modal, dibagi proporsional ke tiap uang yang masuk; (2) kredit tanpa data modal: untung = persentase di atas × angsuran tiap bulan (DP tidak dihitung); (3) pendapatan: profit dihitung di bulan tanggal payment. Angsuran yang sudah lewat jatuh tempo tetapi belum dibayar diproyeksikan masuk bulan ini.</div></div>
+<div class="c" style="margin-bottom:16px"><div class="hd"><h2>⏳ Panjang Angsuran &amp; Estimasi Selesai</h2></div>
+<div class="big" id="lmt"></div><div class="pg" style="margin:8px 0"><i id="lmp" style="width:0"></i></div><div class="pv" id="lms" style="margin:0 0 10px"></div>
+<div class="tw tl"><table><thead><tr><th>Nama</th><th>Keterangan</th><th>Angsuran/bln</th><th>Progres</th><th>Sisa</th><th>Estimasi Selesai</th><th>Dasar Untung</th><th>Untung Total</th></tr></thead><tbody id="lmb"></tbody></table></div></div>
 <div class="bar"><input id="ixq" placeholder="Cari barang…"><button class="p" id="ixadd">+ Tambah Pendapatan</button><button class="p" id="ixxl">📥 Ekspor Excel</button><button id="ixcsv">Ekspor CSV</button><button id="ixbk">Cadangan JSON</button><label class="lbl">Impor (JSON/Excel/CSV)<input id="ixim" type="file" accept=".json,.xlsx,.xls,.csv" hidden></label></div>
 <div class="tw tl"><table><thead><tr><th>Barang</th><th>Tgl Order</th><th>Tgl Payment</th><th>Modal</th><th>Profit</th><th>Harga Jual</th><th>Aksi</th></tr></thead><tbody id="ixl"></tbody><tfoot id="ixlf"></tfoot></table></div>
 </div>
@@ -416,12 +426,12 @@ function byId(id){return data.find(function(d){return d.id===id})}
 function fx(x){return(Math.round(x*10)/10).toString().replace(".",",")}
 function shN(n){return n>=1e9?fx(n/1e9)+" M":n>=1e6?fx(n/1e6)+" jt":n>=1e3?fx(n/1e3)+" rb":""+n}
 function nice(mx){var raw=mx/3,p=Math.pow(10,Math.floor(Math.log10(raw))),m=[1,1.5,2,2.5,3,4,5,6,8,10];for(var i=0;i<m.length;i++)if(m[i]*p>=raw)return m[i]*p*3;return 30*p}
-function bars(v,lab){var mx=Math.max.apply(null,v.concat([0])),top=mx>0?nice(mx):3000000,st=top/3,g="",x="",i;
+function bars(v,lab,pj){var mx=Math.max.apply(null,v.concat([0])),top=mx>0?nice(mx):3000000,st=top/3,g="",x="",i;
 for(i=0;i<=3;i++){g+='<i style="bottom:'+i/3*100+'%"></i>';x+='<em style="bottom:'+i/3*100+'%">'+shN(st*i)+'</em>'}
-return '<div class=gl>'+g+'</div><div class=ax>'+x+'</div>'+v.map(function(a,i){return '<div class=b title="'+rp(a)+'"><div class=bw><i style="height:'+Math.max(a>0?3:0,a/top*100)+'%"></i></div><span>'+lab[i]+'</span></div>'}).join("")}
+return '<div class=gl>'+g+'</div><div class=ax>'+x+'</div>'+v.map(function(a,i){return '<div class="b'+(pj&&pj[i]?" pj":"")+'" title="'+rp(a)+(pj&&pj[i]?" (proyeksi)":"")+'"><div class=bw><i style="height:'+Math.max(a>0?3:0,a/top*100)+'%"></i></div><span>'+lab[i]+'</span></div>'}).join("")}
 function dash(){
-var w=+$("rw").value,tM=0,tIn=0,tU=0,tS=0,akt=0,lun=0,late=0,ang=0,tTag=0;
-data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=tot-(x.modal||0);tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
+var w=+$("rw").value,tM=0,tIn=0,tU=0,tS=0,akt=0,lun=0,late=0,ang=0,tTag=0,tNow=0;
+data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=krProfit(x);tNow+=x.modal>0?(x.dp||0)+x.angs*(x.bulan-x.sisa)-x.modal:x.angs*(x.bulan-x.sisa)*rate()/100;tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
 if(x.sisa>0){akt++;tS+=x.angs*x.sisa;ang+=x.angs;if(dd(x)<0)late++}else lun++});
 var MS=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],base=T.getFullYear()*12+T.getMonth();
 var rem=data.filter(function(x){return x.sisa>0&&dd(x)!==null&&dd(x)<=w}).sort(function(a,b){return dd(a)-dd(b)});
@@ -438,7 +448,7 @@ var s1=m.reduce(function(a,b){return a+b},0)+lt,s2=rc.reduce(function(a,b){retur
 $("b1t").innerHTML=rp(s1)+(lt?' <small>tertunggak '+rp(lt)+'</small>':'');$("b1").innerHTML=bars(m,l1);
 $("b2t").innerHTML=rp(s2);$("b2").innerHTML=bars(rc,l2);
 var pc=tTag?Math.round(tIn/tTag*100):0;
-$("kpi").innerHTML=[["Kredit berjalan",akt],["Terlambat",'<span style="color:'+(late?"var(--wr)":"inherit")+'">'+late+'</span>'],["Lunas",lun],["Sisa tagihan",rp(tS)],["Angsuran / bulan",rp(ang)],["Total modal",rp(tM)],["Uang sudah masuk",rp(tIn)+" ("+pc+"%)"],["Untung proyeksi",rp(tU)],["Untung saat ini",'<span style="color:var('+(tIn-tM>=0?"--ok":"--wr")+')">'+rp(tIn-tM)+'</span>']].map(function(r){return '<div class=kr><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join("");
+$("kpi").innerHTML=[["Kredit berjalan",akt],["Terlambat",'<span style="color:'+(late?"var(--wr)":"inherit")+'">'+late+'</span>'],["Lunas",lun],["Sisa tagihan",rp(tS)],["Angsuran / bulan",rp(ang)],["Total modal",rp(tM)],["Uang sudah masuk",rp(tIn)+" ("+pc+"%)"],["Untung proyeksi",rp(tU)],["Untung saat ini",'<span style="color:var('+(tNow>=0?"--ok":"--wr")+')">'+rp(tNow)+'</span>']].map(function(r){return '<div class=kr><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join("");
 pays.sort(function(a,b){return a.s<b.s?1:a.s>b.s?-1:0});
 $("lt").innerHTML=pays.length?pays.slice(0,5).map(function(p){return '<div class=rl style="border-top:0;padding:7px 0"><span class=ava>'+esc((p.n||"?").charAt(0).toUpperCase())+'</span><div class=i><b>'+esc(p.n)+'</b><small>'+esc(p.k||"-")+' • '+fmD(new Date(p.s+"T00:00:00"))+'</small></div><b style="color:var(--ok)">+ '+rp(p.a)+'</b></div>'}).join(""):'<div class=em>Belum ada pembayaran tercatat.</div>';
 var ber=akt-late,n=akt+lun,C=2*Math.PI*54,off=0,sv="",segs=[[ber,"var(--bar)","Berjalan"],[late,"var(--pk)","Terlambat"],[lun,"var(--yl)","Lunas"]];
@@ -455,7 +465,7 @@ if(isLun(x))return false;
 if(st==="late"&&!(dd(x)!==null&&dd(x)<0))return false;return true});
 var fT=0,fS=0,fM=0,fU=0;
 $("tb").innerHTML=rows.length?rows.map(function(x){
-var tot=x.angs*x.bulan,sis=x.angs*x.sisa,un=(x.dp||0)+tot-(x.modal||0);if(!x.tanda){fT+=tot;fS+=sis;fM+=x.modal||0;fU+=un}
+var tot=x.angs*x.bulan,sis=x.angs*x.sisa,un=(x.dp||0)+tot-(x.modal||0);if(!x.tanda){fT+=tot;fS+=sis;fM+=x.modal||0;fU+=x.modal?un:0}
 var pct=x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0;
 return "<tr><td><b>"+esc(x.nama)+"</b></td><td>"+esc(x.ket)+"</td><td>"+fmD(new Date(x.tgl+"T00:00:00"))+"</td><td class=n>"+(x.dp?rp(x.dp):"-")+"</td><td class=n>"+rp(x.angs)+"</td><td class=n>"+x.bulan+"</td><td class=n>"+rp(tot)+"</td><td class=n>"+(x.modal?rp(x.modal):"-")+"</td><td class=n style='color:var("+(un>=0?"--ok":"--wr")+")'>"+(x.modal?rp(un):"-")+"</td><td class=n>"+(x.sisa>0?x.sisa:"0")+"</td><td class=n>"+rp(sis)+"</td><td>"+(x.sisa>0?fmD(nd(x))+"<br>":"")+bdg(x)+"</td><td><div class=pg title='"+pct+"%'><i style='width:"+pct+"%'></i></div></td><td class=a><button class=p onclick='openP("+x.id+")' title='Catat pembayaran'>✓ Bayar</button><button onclick='unpay("+x.id+")' title='Batalkan pembayaran terakhir'>↩</button><button onclick='wa("+x.id+")' title='Ingatkan via WhatsApp'>💬</button><button onclick='edit("+x.id+")'>Edit</button><button class=d onclick='del("+x.id+")'>Hapus</button></td></tr>"}).join(""):"<tr><td colspan=14 class=em>Belum ada data.</td></tr>";
 $("tf").innerHTML=rows.length?"<tr><td colspan=6>Total ("+rows.length+" data)</td><td class=n>"+rp(fT)+"</td><td class=n>"+rp(fM)+"</td><td class=n>"+rp(fU)+"</td><td></td><td class=n>"+rp(fS)+"</td><td colspan=3></td></tr>":"";
@@ -797,20 +807,43 @@ bg.innerHTML=h})();
 /* ===== Pendapatan (barang, modal, profit) + rekap keuntungan bulanan gabungan ===== */
 var pd=[],pdErr="",pdId=null,IM=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"],MSs=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 function mk(y,m){return y+"-"+("0"+(m+1)).slice(-2)}
-function profMaps(){var K={},P={};
-data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;if(tot<=0)return;var mg=(tot-(x.modal||0))/tot;
-var ad=function(d,a){if(!d||!a)return;var k=d.slice(0,7);K[k]=(K[k]||0)+a*mg};ad(x.tgl,x.dp);hist(x).forEach(function(d){ad(d,x.angs)})});
-pd.forEach(function(r){if(r.tgl_payment){var k=r.tgl_payment.slice(0,7);P[k]=(P[k]||0)+(+r.profit||0)}});return{K:K,P:P}}
-function renderProfit(){var M=profMaps(),base=T.getFullYear()*12+T.getMonth(),v=[],l=[],tot=0,i,b,m,t;
-for(i=-5;i<=0;i++){b=base+i;m=((b%12)+12)%12;t=(M.K[mk(Math.floor(b/12),m)]||0)+(M.P[mk(Math.floor(b/12),m)]||0);v.push(t);l.push(MSs[m]);tot+=t}
-$("b3t").innerHTML=rp(tot)+' <small>bulan ini '+rp(v[5])+'</small>';$("b3").innerHTML=bars(v,l);renderRekap(M);renderPd()}
-function renderRekap(M){var sel=$("ixy"),cur=sel.value,ys={},cy=T.getFullYear();ys[cy]=1;Object.keys(M.K).concat(Object.keys(M.P)).forEach(function(k){ys[k.slice(0,4)]=1});
+function rate(){var r=parseFloat(localStorage.getItem("kredit_rate"));return isFinite(r)&&r>=0?r:1.5}
+function krProfit(x){return x.modal>0?(x.dp||0)+x.angs*x.bulan-x.modal:x.angs*x.bulan*rate()/100}
+function profMaps(){var K={},KP={},C={},CP={},P={},R=rate()/100,cm=mk(T.getFullYear(),T.getMonth()),ad=function(o,k,v){o[k]=(o[k]||0)+v};
+data.forEach(function(x){if(x.tanda||!x.tgl)return;var tot=(x.dp||0)+x.angs*x.bulan,hm=x.modal>0,mg=hm&&tot>0?(tot-x.modal)/tot:0,pi=hm?x.angs*mg:x.angs*R,k,p,j,d;
+if(x.dp){k=x.tgl.slice(0,7);ad(C,k,x.dp);ad(K,k,hm?x.dp*mg:0)}
+hist(x).forEach(function(s){if(!s)return;k=s.slice(0,7);ad(C,k,x.angs);ad(K,k,pi)});
+p=x.bulan-x.sisa;for(j=1;j<=x.sisa;j++){d=am(x.tgl,p+j);if(!d)continue;k=mk(d.getFullYear(),d.getMonth());if(k<cm)k=cm;ad(CP,k,x.angs);ad(KP,k,pi)}});
+pd.forEach(function(r){if(r.tgl_payment)ad(P,r.tgl_payment.slice(0,7),+r.profit||0)});return{K:K,KP:KP,C:C,CP:CP,P:P,cm:cm}}
+function renderProfit(){var M=profMaps(),base=T.getFullYear()*12+T.getMonth(),v=[],l=[],tot=0,i,b,m,t,k;
+for(i=-5;i<=0;i++){b=base+i;m=((b%12)+12)%12;k=mk(Math.floor(b/12),m);t=(M.K[k]||0)+(M.P[k]||0);v.push(t);l.push(MSs[m]);tot+=t}
+$("b3t").innerHTML=rp(tot)+' <small>bulan ini '+rp(v[5])+'</small>';$("b3").innerHTML=bars(v,l);renderRekap(M);renderLama();renderPd()}
+function rekapData(M,y){var o=[],i,k;for(i=0;i<12;i++){k=mk(y,i);o.push({i:i,c:(M.C[k]||0)+(M.CP[k]||0),kv:(M.K[k]||0)+(M.KP[k]||0),kr:M.K[k]||0,kp:M.KP[k]||0,pv:M.P[k]||0,fut:k>M.cm,cur:k===M.cm})}return o}
+function renderRekap(M){var sel=$("ixy"),cur=sel.value,ys={},cy=T.getFullYear();ys[cy]=1;[M.K,M.KP,M.C,M.CP,M.P].forEach(function(o){Object.keys(o).forEach(function(k){ys[k.slice(0,4)]=1})});
 var yl=Object.keys(ys).sort().reverse();sel.innerHTML=yl.map(function(y){return'<option>'+y+'</option>'}).join("");sel.value=yl.indexOf(cur)>=0?cur:String(cy);
-var y=+sel.value,a=[],kt=0,pt=0,rows="",i,k,kv,pv;
-for(i=0;i<12;i++){k=mk(y,i);kv=M.K[k]||0;pv=M.P[k]||0;kt+=kv;pt+=pv;a.push(kv+pv);rows+='<tr><td>'+IM[i]+'</td><td class=n>'+(kv?rp(kv):"-")+'</td><td class=n>'+(pv?rp(pv):"-")+'</td><td class=n><b>'+(kv+pv?rp(kv+pv):"-")+'</b></td></tr>'}
-$("ixr").innerHTML=rows;$("ixf").innerHTML='<tr><td>Total '+y+'</td><td class=n>'+rp(kt)+'</td><td class=n>'+rp(pt)+'</td><td class=n>'+rp(kt+pt)+'</td></tr>';
-$("ixt").innerHTML=rp(kt+pt);$("ixb").innerHTML=bars(a,MSs);
+var y=+sel.value,R=rekapData(M,y),ct=0,kt=0,pt=0,kr=0,kp=0;if(document.activeElement!==$("rtv"))$("rtv").value=rate();
+$("ixr").innerHTML=R.map(function(r){ct+=r.c;kt+=r.kv;pt+=r.pv;kr+=r.kr;kp+=r.kp;var t=r.kv+r.pv;
+return '<tr'+(r.fut?' style="opacity:.78"':'')+'><td>'+IM[r.i]+(r.fut?' <span class="bd">proyeksi</span>':r.cur?' <span class="bd today">bulan ini</span>':'')+'</td><td class=n>'+(r.c?rp(r.c):"-")+'</td><td class=n>'+(r.kv?rp(r.kv):"-")+'</td><td class=n>'+(r.pv?rp(r.pv):"-")+'</td><td class=n><b>'+(t?rp(t):"-")+'</b></td></tr>'}).join("");
+$("ixf").innerHTML='<tr><td>Total '+y+'</td><td class=n>'+rp(ct)+'</td><td class=n>'+rp(kt)+'</td><td class=n>'+rp(pt)+'</td><td class=n>'+rp(kt+pt)+'</td></tr>';
+$("ixt").innerHTML=rp(kt+pt)+' <small>untung '+y+'</small>';
+$("ixs").textContent="Uang masuk "+rp(ct)+" • Untung kredit "+rp(kt)+" (terealisasi "+rp(kr)+", proyeksi "+rp(kp)+") • Untung pendapatan "+rp(pt);
+$("ixc").innerHTML=bars(R.map(function(r){return r.c}),MSs,R.map(function(r){return r.fut}));$("ixb").innerHTML=bars(R.map(function(r){return r.kv+r.pv}),MSs,R.map(function(r){return r.fut}));
 var w=pd.filter(function(r){return!r.tgl_payment});$("ixn").textContent=w.length?w.length+" pendapatan belum punya tanggal payment (profit "+rp(w.reduce(function(s,r){return s+(+r.profit||0)},0))+"), belum masuk rekap.":""}
+function lmDiff(f){return f?f.getFullYear()*12+f.getMonth()-(T.getFullYear()*12+T.getMonth()):null}
+function lmTxt(f){var d=lmDiff(f);return d===null?"-":d>0?d+" bulan lagi":d===0?"bulan ini":"lewat jadwal"}
+function lamaList(){return data.filter(function(x){return!x.tanda&&x.sisa>0&&x.bulan>0}).map(function(x){return{x:x,f:am(x.tgl,x.bulan)}}).sort(function(a,b){return(a.f||0)-(b.f||0)})}
+function renderLama(){var l=lamaList(),paid=0,tot=0,sis=0,last=null;
+l.forEach(function(o){var x=o.x;paid+=x.angs*(x.bulan-x.sisa);tot+=x.angs*x.bulan;sis+=x.angs*x.sisa;if(o.f&&(!last||o.f>last))last=o.f});
+var pct=tot?Math.round(paid/tot*100):0;$("lmt").innerHTML=pct+'% <small>angsuran terbayar ('+l.length+' kredit berjalan)</small>';$("lmp").style.width=pct+"%";
+$("lms").textContent=l.length?"Semua kredit berjalan diperkirakan selesai "+IM[last.getMonth()]+" "+last.getFullYear()+" ("+lmTxt(last)+"). Sisa tagihan "+rp(sis)+".":"Tidak ada kredit berjalan.";
+$("lmb").innerHTML=l.length?l.map(function(o){var x=o.x,pc=Math.round((x.bulan-x.sisa)/x.bulan*100);
+return '<tr><td><b>'+esc(x.nama)+'</b></td><td>'+esc(x.ket||"-")+'</td><td class=n>'+rp(x.angs)+'</td><td><div class=pg><i style="width:'+pc+'%"></i></div><small>'+(x.bulan-x.sisa)+'/'+x.bulan+' bulan • '+pc+'%</small></td><td class=n>'+x.sisa+' bln</td><td>'+(o.f?fmD(o.f)+'<br><small>'+lmTxt(o.f)+'</small>':"-")+'</td><td>'+(x.modal>0?"Modal":fx(rate())+"% angsuran")+'</td><td class=n>'+rp(krProfit(x))+'</td></tr>'}).join(""):'<tr><td class=em colspan=8>Tidak ada kredit berjalan.</td></tr>'}
+$("rtv").onchange=function(){var v=parseFloat(String(this.value).replace(",","."));if(isFinite(v)&&v>=0){try{localStorage.setItem("kredit_rate",v)}catch(e){}}render()};
+var RKH=["Bulan","Jenis","Uang Masuk (Angsuran + DP)","Untung Kredit","Untung Pendapatan","Total Untung"],LMH=["Nama","Keterangan","Angsuran/Bulan","Terbayar (bulan)","Tenor (bulan)","Progres %","Sisa (bulan)","Sisa Tagihan","Estimasi Selesai","Dasar Untung","Untung Total"];
+function rekapRows(){var y=+$("ixy").value||T.getFullYear();return rekapData(profMaps(),y).map(function(r){return[IM[r.i]+" "+y,r.fut?"Proyeksi":r.cur?"Bulan ini":"Realisasi",Math.round(r.c),Math.round(r.kv),Math.round(r.pv),Math.round(r.kv+r.pv)]})}
+function lamaRows(){return lamaList().map(function(o){var x=o.x;return[x.nama,x.ket||"",x.angs,x.bulan-x.sisa,x.bulan,x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0,x.sisa,x.angs*x.sisa,o.f?iso(o.f):"",x.modal>0?"Modal":fx(rate())+"% angsuran",Math.round(krProfit(x))]})}
+$("rkc").onclick=function(){csvOut("rekap-bulanan-"+$("ixy").value+".csv",RKH,rekapRows())};
+$("rkx").onclick=function(){xlsOut("rekap-keuntungan-"+iso(new Date())+".xlsx",[["Rekap "+$("ixy").value,RKH,rekapRows(),[2,3,4,5]],["Estimasi Selesai",LMH,lamaRows(),[2,7,10]]])};
 $("ixy").onchange=renderProfit;$("ixq").oninput=renderPd;
 function renderPd(){var q=$("ixq").value.toLowerCase(),rows=pd.filter(function(r){return!q||(r.barang||"").toLowerCase().indexOf(q)>=0}).sort(function(a,b){var x=a.tgl_payment||a.tgl_order||"",y=b.tgl_payment||b.tgl_order||"";return x<y?1:x>y?-1:0}),tm=0,tp=0,dd2=function(s){return s?fmD(new Date(s+"T00:00:00")):"-"};
 $("ixl").innerHTML=pdErr?'<tr><td class=em colspan=7>'+esc(pdErr)+'</td></tr>':rows.length?rows.map(function(r){var m=+r.modal||0,pf=+r.profit||0,id=+r.id;tm+=m;tp+=pf;
@@ -838,7 +871,7 @@ pdRows().forEach(function(r){var m=+r.modal||0,p=+r.profit||0;l.push([r.barang,m
 $("ixxl").onclick=function(){if(!window.XLSX){alert("Pustaka Excel belum termuat. Periksa koneksi internet, lalu coba lagi.");return}
 var U=XLSX.utils,A=[["Barang","Modal","Profit","Harga Jual","Tanggal Order","Tanggal Payment"]],M=profMaps(),y=+$("ixy").value||T.getFullYear(),B=[["Bulan "+y,"Untung Kredit","Untung Pendapatan","Total"]],i,k,kv,pv;
 pdRows().forEach(function(r){var m=+r.modal||0,p=+r.profit||0;A.push([r.barang,m,p,m+p,r.tgl_order||"",r.tgl_payment||""])});
-for(i=0;i<12;i++){k=mk(y,i);kv=Math.round(M.K[k]||0);pv=Math.round(M.P[k]||0);B.push([IM[i],kv,pv,kv+pv])}
+for(i=0;i<12;i++){k=mk(y,i);kv=Math.round((M.K[k]||0)+(M.KP[k]||0));pv=Math.round(M.P[k]||0);B.push([IM[i],kv,pv,kv+pv])}
 var w1=U.aoa_to_sheet(A),w2=U.aoa_to_sheet(B),RP='"Rp"#,##0',fm=function(ws,cols){Object.keys(ws).forEach(function(a){if(a[0]==="!")return;var c=U.decode_cell(a);if(c.r>0&&cols.indexOf(c.c)>=0&&ws[a].t==="n")ws[a].z=RP})};
 fm(w1,[1,2,3]);fm(w2,[1,2,3]);w1["!cols"]=[{wch:30},{wch:14},{wch:14},{wch:14},{wch:14},{wch:16}];w2["!cols"]=[{wch:16},{wch:18},{wch:20},{wch:16}];
 var wb=U.book_new();U.book_append_sheet(wb,w1,"Pendapatan");U.book_append_sheet(wb,w2,"Rekap Bulanan");

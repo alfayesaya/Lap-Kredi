@@ -30,6 +30,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-app
 .top #gs{flex:1;min-width:170px;max-width:420px;border-radius:99px;padding:11px 18px;border:0}
 .tr2{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .av{width:42px;height:42px;border-radius:50%;background:var(--yl);color:var(--ylt);display:grid;place-items:center;font-weight:800}
+input[type=search]{-webkit-appearance:none;appearance:none}
 input,select,button{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--br);border-radius:12px;padding:9px 12px}
 button{border-radius:99px;cursor:pointer;padding:9px 16px}
 .p{background:var(--pr);color:var(--prt);border-color:var(--pr);font-weight:700}
@@ -166,6 +167,8 @@ td.a button{min-height:38px;margin-bottom:4px}
 @keyframes bgl{from{transform:translateX(125vw)}to{transform:translateX(-25vw)}}
 #bgfx .p{animation:bgfloat ease-in-out infinite alternate}
 @keyframes bgfloat{from{transform:translate(0,0) rotate(-10deg)}to{transform:translate(34px,-46px) rotate(10deg)}}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g2 input,.g2 select{min-width:0;width:100%}
+@media(max-width:480px){#s2 .g2{grid-template-columns:1fr}}
 #lg>.c{position:relative;z-index:1;background:color-mix(in srgb,var(--card) 78%,transparent);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .steps{margin:16px 0 0;padding:12px 14px 12px 34px;border-radius:16px;background:rgba(85,187,255,.13);font-size:13px;line-height:1.55;color:var(--mu)}
 .steps h3{margin:0 0 6px;font-size:14px;color:inherit;margin-left:-20px}.steps b{color:inherit;font-weight:700}
@@ -199,7 +202,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 <button id="t7" title="Data Kreditur">👥</button>
 </aside>
 <main class="mn">
-<div class="top"><h1 id="pt">Ringkasan</h1><input id="gs" placeholder="Cari pelanggan…"><div class="tr2"><span id="sync" style="font-size:13px"></span><button id="lo">Keluar</button><button id="qa">📨 Ingatkan Semua</button><button class="p" id="payb">✓ Catat Pembayaran</button><span class="av">K</span></div></div>
+<div class="top"><h1 id="pt">Ringkasan</h1><input id="gs" type="search" autocomplete="off" placeholder="Cari pelanggan…"><div class="tr2"><span id="sync" style="font-size:13px"></span><button id="lo">Keluar</button><button id="qa">📨 Ingatkan Semua</button><button class="p" id="payb">✓ Catat Pembayaran</button><span class="av">K</span></div></div>
 
 <div id="v1">
 <div class="g3">
@@ -220,7 +223,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 
 <div id="v2" style="display:none">
 <div class="bar">
-<input id="q" placeholder="Cari nama / keterangan…">
+<input id="q" type="search" autocomplete="off" placeholder="Cari nama / keterangan…">
 <select id="st"><option value="all">Semua (belum lunas)</option><option value="late">Terlambat</option></select>
 <button class="p" id="add">+ Tambah</button>
 <button class="p" id="xl">📥 Ekspor Excel</button><button id="csv">Ekspor CSV</button><button id="csv2">Ekspor Riwayat Bayar</button><button id="bk">Cadangan JSON</button><label class="lbl">Impor JSON<input id="imp" type="file" accept=".json" hidden></label>
@@ -256,15 +259,15 @@ td.a button{min-height:38px;margin-bottom:4px}
 <div class="c" style="margin-bottom:16px"><div class="hd"><h2>⏳ Panjang Angsuran &amp; Estimasi Selesai</h2></div>
 <div class="big" id="lmt"></div><div class="pg" style="margin:8px 0"><i id="lmp" style="width:0"></i></div><div class="pv" id="lms" style="margin:0 0 10px"></div>
 <div class="tw tl"><table><thead><tr><th>Nama</th><th>Keterangan</th><th>Angsuran/bln</th><th>Progres</th><th>Sisa</th><th>Estimasi Selesai</th><th>Dasar Untung</th><th>Untung Total</th></tr></thead><tbody id="lmb"></tbody></table></div></div>
-<div class="bar"><input id="ixq" placeholder="Cari barang…"><button class="p" id="ixadd">+ Tambah Pendapatan</button><button class="p" id="ixxl">📥 Ekspor Excel</button><button id="ixcsv">Ekspor CSV</button><button id="ixbk">Cadangan JSON</button><label class="lbl">Impor (JSON/Excel/CSV)<input id="ixim" type="file" accept=".json,.xlsx,.xls,.csv" hidden></label></div>
+<div class="bar"><input id="ixq" type="search" autocomplete="off" placeholder="Cari barang…"><button class="p" id="ixadd">+ Tambah Pendapatan</button><button class="p" id="ixxl">📥 Ekspor Excel</button><button id="ixcsv">Ekspor CSV</button><button id="ixbk">Cadangan JSON</button><label class="lbl">Impor (JSON/Excel/CSV)<input id="ixim" type="file" accept=".json,.xlsx,.xls,.csv" hidden></label></div>
 <div class="tw tl"><table><thead><tr><th>Barang</th><th>Tgl Order</th><th>Tgl Payment</th><th>Modal</th><th>Profit</th><th>Harga Jual</th><th>Aksi</th></tr></thead><tbody id="ixl"></tbody><tfoot id="ixlf"></tfoot></table></div>
 </div>
 <div id="v7" style="display:none">
-<div class="bar"><input id="cuq" placeholder="Cari nama / email / WA…"><select id="cuf"><option value="all">Semua kreditur</option><option value="due">Punya tagihan berjalan</option><option value="wait">Bukti bayar menunggu</option></select><button id="cur">↻ Muat ulang</button><button class="p" id="kxx">📥 Ekspor Excel</button><button id="kxc">Ekspor CSV</button><button id="kxj">Cadangan JSON (+KTP)</button><span class="pv" id="cun" style="align-self:center;margin:0"></span></div>
+<div class="bar"><input id="cuq" type="search" autocomplete="off" placeholder="Cari nama / email / WA…"><select id="cuf"><option value="all">Semua kreditur</option><option value="due">Punya tagihan berjalan</option><option value="wait">Bukti bayar menunggu</option></select><button id="cur">↻ Muat ulang</button><button class="p" id="kxx">📥 Ekspor Excel</button><button id="kxc">Ekspor CSV</button><button id="kxj">Cadangan JSON (+KTP)</button><span class="pv" id="cun" style="align-self:center;margin:0"></span></div>
 <div class="tw tl"><table><thead><tr><th>Kreditur</th><th>WhatsApp</th><th>Pengajuan</th><th>Kredit</th><th>Sisa Tagihan</th><th>Bukti Menunggu</th><th>Terdaftar</th><th>Aksi</th></tr></thead><tbody id="cul"></tbody></table></div>
 </div>
 <div id="v8" style="display:none">
-<div class="bar"><input id="lzq" placeholder="Cari nama / keterangan…"><button class="p" id="lzx">📥 Ekspor Excel</button><button id="lzc">Ekspor CSV</button><span class="pv" id="lzs" style="align-self:center;margin:0"></span></div>
+<div class="bar"><input id="lzq" type="search" autocomplete="off" placeholder="Cari nama / keterangan…"><button class="p" id="lzx">📥 Ekspor Excel</button><button id="lzc">Ekspor CSV</button><span class="pv" id="lzs" style="align-self:center;margin:0"></span></div>
 <div class="tw tl"><table><thead><tr><th>Nama</th><th>Keterangan</th><th>Tgl Kredit</th><th>Tgl Lunas</th><th>Tenor</th><th>Total Dibayar</th><th>Modal</th><th>Untung</th><th>Aksi</th></tr></thead><tbody id="lzb"></tbody><tfoot id="lzf"></tfoot></table></div>
 </div>
 </main></div>
@@ -295,7 +298,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 </div>
 <div id="s1" style="display:none">
 <button class="back" id="ab">‹ Kembali</button>
-<h2>🔐 Masuk Admin</h2><div class="f" style="margin-top:10px"><label>Email</label><input id="le" type="email"></div><div class="f"><label>Password</label><input id="lp" type="password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button>
+<h2>🔐 Masuk Admin</h2><div class="f" style="margin-top:10px"><label>Email</label><input id="le" type="email" autocomplete="username"></div><div class="f"><label>Password</label><input id="lp" type="password" autocomplete="current-password"></div><div class="pv" id="lm"></div><button class="p" id="lb" style="width:100%">Masuk</button>
 <div style="text-align:center;margin-top:10px"><button class="lk" id="pwl1">Lupa password?</button></div>
 </div>
 <div id="s2" style="display:none">
@@ -575,7 +578,8 @@ var r=await fetch(SB+p,{method:m||"GET",headers:h,body:body?JSON.stringify(body)
 if(r.status===401&&sess){if(!re&&await refresh())return api(p,m,body,extra,1);showLogin();throw new Error("Sesi habis, silakan masuk lagi")}
 if(!r.ok)throw new Error((await r.text())||r.status);var t=await r.text();return t?JSON.parse(t):null}
 function fromRow(r){return{id:r.id,nama:r.nama,ket:r.ket||"",hp:r.hp||"",tgl:r.tgl||"",dp:+r.dp||0,modal:+r.modal||0,angs:+r.angs||0,bulan:r.bulan,sisa:r.sisa,bayar:r.bayar||[],tanda:!!r.tanda,uid:r.user_id||null}}
-function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],tanda:!!x.tanda,user_id:x.uid||null,updated_at:new Date().toISOString()}}
+function myId(){var u=sess&&sess.user&&sess.user.id;if(u)return u;try{return JSON.parse(atob(sess.access_token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).sub}catch(e){return null}}
+function toRow(x){return{id:x.id,nama:x.nama,ket:x.ket||"",hp:x.hp||"",tgl:x.tgl||null,dp:x.dp||0,modal:x.modal||0,angs:x.angs||0,bulan:x.bulan,sisa:x.sisa,bayar:x.bayar||[],tanda:!!x.tanda,user_id:x.uid||myId(),updated_at:new Date().toISOString()}}
 async function load(){ss("Memuat…");try{var rows=await api("/rest/v1/kredit?select=*&order=id");data=rows.map(fromRow);srv=data.map(function(x){return x.id});render();loadReq();loadPay();loadProf();loadPd();ss("☁️ Tersinkron","var(--ok)")}catch(e){ss("⚠️ "+e.message,"var(--wr)")}}
 function sync(){ss("Menyimpan…");clearTimeout(tm);tm=setTimeout(push,500)}
 async function push(){try{var cur=data.map(function(x){return x.id}),gone=srv.filter(function(i){return cur.indexOf(i)<0});
@@ -618,7 +622,7 @@ if(!b){km("Isi barang yang ingin dikredit.",1);return}
 if(d===""||+d<0){km("Isi DP (tulis 0 jika tanpa DP).",1);return}
 var btn=this;btn.disabled=true;km("Mendaftarkan akun…");
 try{var hp=$("kh").value.trim(),r=await fetch(SB+"/auth/v1/signup",{method:"POST",headers:{apikey:KEYP,"Content-Type":"application/json"},body:JSON.stringify({email:e,password:w,data:{nama:n,hp:hp}})}),j=await r.json();
-if(!r.ok){var em=j.msg||j.message||j.error_description||"";throw new Error(/already/i.test(em)?"Email sudah terdaftar. Silakan masuk.":em||"Pendaftaran gagal")}
+if(!r.ok){var em=j.msg||j.message||j.error_description||"";throw new Error(/rate.?limit/i.test(em+" "+(j.error_code||""))||r.status===429?"Pendaftaran sedang penuh karena batas pengiriman email tercapai. Data Anda tidak hilang. Coba lagi beberapa saat lagi atau hubungi admin.":/already/i.test(em)?"Email sudah terdaftar. Silakan masuk.":em||"Pendaftaran gagal")}
 PEND={nama:n,hp:hp,email:e,barang:b,dp:Math.round(+d),ktp:ktpData};
 try{localStorage.setItem("kredit_pend",JSON.stringify(PEND))}catch(x){}
 ["kn","ke","kw","kh","kb","kd","kf"].forEach(function(i){$(i).value=""});$("kp").innerHTML="";$("kdp").textContent="";ktpData="";km("");
@@ -664,7 +668,7 @@ function myMeta(){return(sess&&sess.user&&sess.user.user_metadata)||{}}
 function readImg(f,ok,bad){if(!/^image\//.test(f.type)){bad("Berkas harus berupa foto.");return}var img=new Image(),u=URL.createObjectURL(f);
 img.onload=function(){var M=1100,r=Math.min(1,M/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.72))};
 img.onerror=function(){URL.revokeObjectURL(u);bad("Foto tidak bisa dibaca.")};img.src=u}
-function popU(sel){var h='<option value="">— tidak ditautkan —</option>',has=false;prof.forEach(function(p){if(p.id===sel)has=true;h+='<option value="'+esc(p.id)+'"'+(p.id===sel?' selected':'')+'>'+esc(p.nama||p.email)+' ('+esc(p.email)+')</option>'});if(sel&&!has)h+='<option value="'+esc(sel)+'" selected>(akun tertaut)</option>';$("fu").innerHTML=h}
+function popU(sel){var h='<option value="">— tidak ditautkan —</option>',has=false;prof.forEach(function(p){if(p.id===myId())return;if(p.id===sel)has=true;h+='<option value="'+esc(p.id)+'"'+(p.id===sel?' selected':'')+'>'+esc(p.nama||p.email)+' ('+esc(p.email)+')</option>'});$("fu").innerHTML=h}
 async function loadProf(){try{prof=await api("/rest/v1/profiles?select=id,nama,email,hp,created_at&order=nama")}catch(e){prof=[]}renderCust();loadKtpSet()}
 function stBd(st,k){return st==="disetujui"?'<span class="bd l">Disetujui</span>':st==="ditolak"?'<span class="bd late">Ditolak</span>':'<span class="bd today">'+(k?"Diproses":st==="baru"?"Diperiksa":"Menunggu")+'</span>'}
 

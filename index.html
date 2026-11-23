@@ -150,7 +150,7 @@ td.a button{min-height:38px;margin-bottom:4px}
 #v3 tbody td:nth-child(8)::before{content:"Progres"}
 #v3 tbody td:nth-child(9)::before{content:"";display:none}
 #ixr td:nth-child(2)::before{content:"Uang Masuk"}#ixr td:nth-child(3)::before{content:"Untung Kredit"}#ixr td:nth-child(4)::before{content:"Untung Pendapatan"}#ixr td:nth-child(5)::before{content:"Total Untung"}
-#lmb td:nth-child(2)::before{content:"Keterangan"}#lmb td:nth-child(3)::before{content:"Angsuran/bln"}#lmb td:nth-child(4)::before{content:"Progres"}#lmb td:nth-child(5)::before{content:"Sisa"}#lmb td:nth-child(6)::before{content:"Estimasi Selesai"}#lmb td:nth-child(7)::before{content:"Dasar Untung"}#lmb td:nth-child(8)::before{content:"Untung Total"}
+#lmb td:nth-child(2)::before{content:"Keterangan"}#lmb td:nth-child(3)::before{content:"Angsuran/bln"}#lmb td:nth-child(4)::before{content:"Progres"}#lmb td:nth-child(5)::before{content:"Sisa"}#lmb td:nth-child(6)::before{content:"Estimasi Selesai"}#lmb td:nth-child(7)::before{content:"Untung / Angsuran"}#lmb td:nth-child(8)::before{content:"Untung Total"}
 #ixl td:nth-child(2)::before{content:"Tgl Order"}#ixl td:nth-child(3)::before{content:"Tgl Payment"}#ixl td:nth-child(4)::before{content:"Modal"}#ixl td:nth-child(5)::before{content:"Profit"}#ixl td:nth-child(6)::before{content:"Harga Jual"}#ixl td:nth-child(7)::before{content:"";display:none}
 #ixr td:first-child,#ixl td:first-child{font-size:inherit}
 #cul td:nth-child(2)::before{content:"WhatsApp"}#cul td:nth-child(3)::before{content:"Pengajuan"}#cul td:nth-child(4)::before{content:"Kredit"}#cul td:nth-child(5)::before{content:"Sisa Tagihan"}#cul td:nth-child(6)::before{content:"Bukti Menunggu"}#cul td:nth-child(7)::before{content:"Terdaftar"}#cul td:nth-child(8)::before{content:"";display:none}
@@ -249,16 +249,15 @@ td.a button{min-height:38px;margin-bottom:4px}
 </div>
 <div id="v6" style="display:none">
 <div class="c" style="margin-bottom:16px"><div class="hd"><h2>📈 Rekap Uang &amp; Keuntungan Bulanan</h2><label>Tahun <select id="ixy"></select></label></div>
-<div class="pv" style="margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">Kredit tanpa data modal: untung = <input id="rtv" type="number" min="0" step="0.1" style="width:84px"> % × angsuran per bulan</div>
 <div class="big" id="ixt"></div><div class="pv" id="ixs" style="margin:2px 0 0"></div><div class="pv" id="ixn" style="margin:2px 0 0"></div>
 <div class="rg2"><div><div class="pv" style="margin:0"><b>Uang masuk per bulan</b> (angsuran + DP)</div><div class="bars" id="ixc"></div></div><div><div class="pv" style="margin:0"><b>Untung per bulan</b> (kredit + pendapatan)</div><div class="bars gr" id="ixb"></div></div></div>
 <div class="pv" style="margin:6px 0 0">Batang pudar = proyeksi (angsuran yang belum dibayar sesuai jadwal).</div>
 <div class="tw" style="margin-top:10px"><table><thead><tr><th>Bulan</th><th>Uang Masuk</th><th>Untung Kredit</th><th>Untung Pendapatan</th><th>Total Untung</th></tr></thead><tbody id="ixr"></tbody><tfoot id="ixf"></tfoot></table></div>
 <div class="bar" style="margin-top:10px"><button class="p" id="rkx">📥 Ekspor Rekap &amp; Estimasi (Excel)</button><button id="rkc">Ekspor CSV</button></div>
-<div class="pv" style="margin-top:8px">Cara hitung untung kredit: (1) kredit yang ada data modalnya: untung total = DP + angsuran × tenor − modal, dibagi proporsional ke tiap uang yang masuk; (2) kredit tanpa data modal: untung = persentase di atas × angsuran tiap bulan (DP tidak dihitung); (3) pendapatan: profit dihitung di bulan tanggal payment. Angsuran yang sudah lewat jatuh tempo tetapi belum dibayar diproyeksikan masuk bulan ini.</div></div>
+<div class="pv" style="margin-top:8px">Cara hitung: hanya kredit yang sudah diisi modalnya. Untung total = DP + (angsuran × tenor) − modal. Untung tiap bulan = uang yang masuk bulan itu × persentase untung kredit tersebut (untung total ÷ total bayar), jadi tiap angsuran membawa untung yang sama. Kredit tanpa modal tidak dihitung. Pendapatan: profit dihitung di bulan tanggal payment. Angsuran yang sudah lewat jatuh tempo tetapi belum dibayar diproyeksikan masuk bulan ini.</div></div>
 <div class="c" style="margin-bottom:16px"><div class="hd"><h2>⏳ Panjang Angsuran &amp; Estimasi Selesai</h2></div>
 <div class="big" id="lmt"></div><div class="pg" style="margin:8px 0"><i id="lmp" style="width:0"></i></div><div class="pv" id="lms" style="margin:0 0 10px"></div>
-<div class="tw tl"><table><thead><tr><th>Nama</th><th>Keterangan</th><th>Angsuran/bln</th><th>Progres</th><th>Sisa</th><th>Estimasi Selesai</th><th>Dasar Untung</th><th>Untung Total</th></tr></thead><tbody id="lmb"></tbody></table></div></div>
+<div class="tw tl"><table><thead><tr><th>Nama</th><th>Keterangan</th><th>Angsuran/bln</th><th>Progres</th><th>Sisa</th><th>Estimasi Selesai</th><th>Untung / Angsuran</th><th>Untung Total</th></tr></thead><tbody id="lmb"></tbody></table></div></div>
 <div class="bar"><input id="ixq" type="search" autocomplete="off" placeholder="Cari barang…"><button class="p" id="ixadd">+ Tambah Pendapatan</button><button class="p" id="ixxl">📥 Ekspor Excel</button><button id="ixcsv">Ekspor CSV</button><button id="ixbk">Cadangan JSON</button><label class="lbl">Impor (JSON/Excel/CSV)<input id="ixim" type="file" accept=".json,.xlsx,.xls,.csv" hidden></label></div>
 <div class="tw tl"><table><thead><tr><th>Barang</th><th>Tgl Order</th><th>Tgl Payment</th><th>Modal</th><th>Profit</th><th>Harga Jual</th><th>Aksi</th></tr></thead><tbody id="ixl"></tbody><tfoot id="ixlf"></tfoot></table></div>
 </div>
@@ -434,7 +433,7 @@ for(i=0;i<=3;i++){g+='<i style="bottom:'+i/3*100+'%"></i>';x+='<em style="bottom
 return '<div class=gl>'+g+'</div><div class=ax>'+x+'</div>'+v.map(function(a,i){return '<div class="b'+(pj&&pj[i]?" pj":"")+'" title="'+rp(a)+(pj&&pj[i]?" (proyeksi)":"")+'"><div class=bw><i style="height:'+Math.max(a>0?3:0,a/top*100)+'%"></i></div><span>'+lab[i]+'</span></div>'}).join("")}
 function dash(){
 var w=+$("rw").value,tM=0,tIn=0,tU=0,tS=0,akt=0,lun=0,late=0,ang=0,tTag=0,tNow=0;
-data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=krProfit(x);tNow+=x.modal>0?(x.dp||0)+x.angs*(x.bulan-x.sisa)-x.modal:x.angs*(x.bulan-x.sisa)*rate()/100;tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
+data.forEach(function(x){if(x.tanda)return;var tot=(x.dp||0)+x.angs*x.bulan;tTag+=tot;tM+=x.modal||0;tU+=krProfit(x);tNow+=x.modal>0?(x.dp||0)+x.angs*(x.bulan-x.sisa)-x.modal:0;tIn+=(x.dp||0)+x.angs*(x.bulan-x.sisa);
 if(x.sisa>0){akt++;tS+=x.angs*x.sisa;ang+=x.angs;if(dd(x)<0)late++}else lun++});
 var MS=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"],base=T.getFullYear()*12+T.getMonth();
 var rem=data.filter(function(x){return x.sisa>0&&dd(x)!==null&&dd(x)<=w}).sort(function(a,b){return dd(a)-dd(b)});
@@ -814,10 +813,10 @@ bg.innerHTML=h})();
 /* ===== Pendapatan (barang, modal, profit) + rekap keuntungan bulanan gabungan ===== */
 var pd=[],pdErr="",pdId=null,IM=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"],MSs=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 function mk(y,m){return y+"-"+("0"+(m+1)).slice(-2)}
-function rate(){var r=parseFloat(localStorage.getItem("kredit_rate"));return isFinite(r)&&r>=0?r:1.5}
-function krProfit(x){return x.modal>0?(x.dp||0)+x.angs*x.bulan-x.modal:x.angs*x.bulan*rate()/100}
-function profMaps(){var K={},KP={},C={},CP={},P={},R=rate()/100,cm=mk(T.getFullYear(),T.getMonth()),ad=function(o,k,v){o[k]=(o[k]||0)+v};
-data.forEach(function(x){if(x.tanda||!x.tgl)return;var tot=(x.dp||0)+x.angs*x.bulan,hm=x.modal>0,mg=hm&&tot>0?(tot-x.modal)/tot:0,pi=hm?x.angs*mg:x.angs*R,k,p,j,d;
+function krMargin(x){var t=(x.dp||0)+x.angs*x.bulan;return x.modal>0&&t>0?(t-x.modal)/t:null}
+function krProfit(x){return x.modal>0?(x.dp||0)+x.angs*x.bulan-x.modal:0}
+function profMaps(){var K={},KP={},C={},CP={},P={},cm=mk(T.getFullYear(),T.getMonth()),ad=function(o,k,v){o[k]=(o[k]||0)+v};
+data.forEach(function(x){if(x.tanda||!x.tgl)return;var tot=(x.dp||0)+x.angs*x.bulan,hm=x.modal>0,mg=hm&&tot>0?(tot-x.modal)/tot:0,pi=hm?x.angs*mg:0,k,p,j,d;
 if(x.dp){k=x.tgl.slice(0,7);ad(C,k,x.dp);ad(K,k,hm?x.dp*mg:0)}
 hist(x).forEach(function(s){if(!s)return;k=s.slice(0,7);ad(C,k,x.angs);ad(K,k,pi)});
 p=x.bulan-x.sisa;for(j=1;j<=x.sisa;j++){d=am(x.tgl,p+j);if(!d)continue;k=mk(d.getFullYear(),d.getMonth());if(k<cm)k=cm;ad(CP,k,x.angs);ad(KP,k,pi)}});
@@ -828,14 +827,17 @@ $("b3t").innerHTML=rp(tot)+' <small>bulan ini '+rp(v[5])+'</small>';$("b3").inne
 function rekapData(M,y){var o=[],i,k;for(i=0;i<12;i++){k=mk(y,i);o.push({i:i,c:(M.C[k]||0)+(M.CP[k]||0),kv:(M.K[k]||0)+(M.KP[k]||0),kr:M.K[k]||0,kp:M.KP[k]||0,pv:M.P[k]||0,fut:k>M.cm,cur:k===M.cm})}return o}
 function renderRekap(M){var sel=$("ixy"),cur=sel.value,ys={},cy=T.getFullYear();ys[cy]=1;[M.K,M.KP,M.C,M.CP,M.P].forEach(function(o){Object.keys(o).forEach(function(k){ys[k.slice(0,4)]=1})});
 var yl=Object.keys(ys).sort().reverse();sel.innerHTML=yl.map(function(y){return'<option>'+y+'</option>'}).join("");sel.value=yl.indexOf(cur)>=0?cur:String(cy);
-var y=+sel.value,R=rekapData(M,y),ct=0,kt=0,pt=0,kr=0,kp=0;if(document.activeElement!==$("rtv"))$("rtv").value=rate();
+var y=+sel.value,R=rekapData(M,y),ct=0,kt=0,pt=0,kr=0,kp=0;
 $("ixr").innerHTML=R.map(function(r){ct+=r.c;kt+=r.kv;pt+=r.pv;kr+=r.kr;kp+=r.kp;var t=r.kv+r.pv;
 return '<tr'+(r.fut?' style="opacity:.78"':'')+'><td>'+IM[r.i]+(r.fut?' <span class="bd">proyeksi</span>':r.cur?' <span class="bd today">bulan ini</span>':'')+'</td><td class=n>'+(r.c?rp(r.c):"-")+'</td><td class=n>'+(r.kv?rp(r.kv):"-")+'</td><td class=n>'+(r.pv?rp(r.pv):"-")+'</td><td class=n><b>'+(t?rp(t):"-")+'</b></td></tr>'}).join("");
 $("ixf").innerHTML='<tr><td>Total '+y+'</td><td class=n>'+rp(ct)+'</td><td class=n>'+rp(kt)+'</td><td class=n>'+rp(pt)+'</td><td class=n>'+rp(kt+pt)+'</td></tr>';
 $("ixt").innerHTML=rp(kt+pt)+' <small>untung '+y+'</small>';
 $("ixs").textContent="Uang masuk "+rp(ct)+" • Untung kredit "+rp(kt)+" (terealisasi "+rp(kr)+", proyeksi "+rp(kp)+") • Untung pendapatan "+rp(pt);
 $("ixc").innerHTML=bars(R.map(function(r){return r.c}),MSs,R.map(function(r){return r.fut}));$("ixb").innerHTML=bars(R.map(function(r){return r.kv+r.pv}),MSs,R.map(function(r){return r.fut}));
-var w=pd.filter(function(r){return!r.tgl_payment});$("ixn").textContent=w.length?w.length+" pendapatan belum punya tanggal payment (profit "+rp(w.reduce(function(s,r){return s+(+r.profit||0)},0))+"), belum masuk rekap.":""}
+var w=pd.filter(function(r){return!r.tgl_payment}),nm=data.filter(function(x){return!x.tanda&&!(x.modal>0)}),
+m1=nm.length?"⚠️ "+nm.length+" kredit belum diisi modalnya, jadi untungnya tidak dihitung: "+nm.slice(0,6).map(function(x){return esc(x.nama)}).join(", ")+(nm.length>6?", +"+(nm.length-6)+" lainnya":"")+". Isi modal lewat Edit di tab Data Kredit.":"",
+m2=w.length?w.length+" pendapatan belum punya tanggal payment (profit "+rp(w.reduce(function(s,r){return s+(+r.profit||0)},0))+"), belum masuk rekap.":"";
+$("ixn").innerHTML=[m1,m2].filter(Boolean).join("<br>")}
 function lmDiff(f){return f?f.getFullYear()*12+f.getMonth()-(T.getFullYear()*12+T.getMonth()):null}
 function lmTxt(f){var d=lmDiff(f);return d===null?"-":d>0?d+" bulan lagi":d===0?"bulan ini":"lewat jadwal"}
 function lamaList(){return data.filter(function(x){return!x.tanda&&x.sisa>0&&x.bulan>0}).map(function(x){return{x:x,f:am(x.tgl,x.bulan)}}).sort(function(a,b){return(a.f||0)-(b.f||0)})}
@@ -843,14 +845,13 @@ function renderLama(){var l=lamaList(),paid=0,tot=0,sis=0,last=null;
 l.forEach(function(o){var x=o.x;paid+=x.angs*(x.bulan-x.sisa);tot+=x.angs*x.bulan;sis+=x.angs*x.sisa;if(o.f&&(!last||o.f>last))last=o.f});
 var pct=tot?Math.round(paid/tot*100):0;$("lmt").innerHTML=pct+'% <small>angsuran terbayar ('+l.length+' kredit berjalan)</small>';$("lmp").style.width=pct+"%";
 $("lms").textContent=l.length?"Semua kredit berjalan diperkirakan selesai "+IM[last.getMonth()]+" "+last.getFullYear()+" ("+lmTxt(last)+"). Sisa tagihan "+rp(sis)+".":"Tidak ada kredit berjalan.";
-$("lmb").innerHTML=l.length?l.map(function(o){var x=o.x,pc=Math.round((x.bulan-x.sisa)/x.bulan*100);
-return '<tr><td><b>'+esc(x.nama)+'</b></td><td>'+esc(x.ket||"-")+'</td><td class=n>'+rp(x.angs)+'</td><td><div class=pg><i style="width:'+pc+'%"></i></div><small>'+(x.bulan-x.sisa)+'/'+x.bulan+' bulan • '+pc+'%</small></td><td class=n>'+x.sisa+' bln</td><td>'+(o.f?fmD(o.f)+'<br><small>'+lmTxt(o.f)+'</small>':"-")+'</td><td>'+(x.modal>0?"Modal":fx(rate())+"% angsuran")+'</td><td class=n>'+rp(krProfit(x))+'</td></tr>'}).join(""):'<tr><td class=em colspan=8>Tidak ada kredit berjalan.</td></tr>'}
-$("rtv").onchange=function(){var v=parseFloat(String(this.value).replace(",","."));if(isFinite(v)&&v>=0){try{localStorage.setItem("kredit_rate",v)}catch(e){}}render()};
-var RKH=["Bulan","Jenis","Uang Masuk (Angsuran + DP)","Untung Kredit","Untung Pendapatan","Total Untung"],LMH=["Nama","Keterangan","Angsuran/Bulan","Terbayar (bulan)","Tenor (bulan)","Progres %","Sisa (bulan)","Sisa Tagihan","Estimasi Selesai","Dasar Untung","Untung Total"];
+$("lmb").innerHTML=l.length?l.map(function(o){var x=o.x,mg=krMargin(x),pc=Math.round((x.bulan-x.sisa)/x.bulan*100);
+return '<tr><td><b>'+esc(x.nama)+'</b></td><td>'+esc(x.ket||"-")+'</td><td class=n>'+rp(x.angs)+'</td><td><div class=pg><i style="width:'+pc+'%"></i></div><small>'+(x.bulan-x.sisa)+'/'+x.bulan+' bulan • '+pc+'%</small></td><td class=n>'+x.sisa+' bln</td><td>'+(o.f?fmD(o.f)+'<br><small>'+lmTxt(o.f)+'</small>':"-")+'</td><td>'+(mg!==null?rp(x.angs*mg)+'<br><small>margin '+fx(mg*100)+'%</small>':'<small>Belum ada modal</small>')+'</td><td class=n>'+(mg!==null?rp(krProfit(x)):"-")+'</td></tr>'}).join(""):'<tr><td class=em colspan=8>Tidak ada kredit berjalan.</td></tr>'}
+var RKH=["Bulan","Jenis","Uang Masuk (Angsuran + DP)","Untung Kredit","Untung Pendapatan","Total Untung"],LMH=["Nama","Keterangan","Angsuran/Bulan","Terbayar (bulan)","Tenor (bulan)","Progres %","Sisa (bulan)","Sisa Tagihan","Estimasi Selesai","Untung per Angsuran","Margin %","Untung Total"];
 function rekapRows(){var y=+$("ixy").value||T.getFullYear();return rekapData(profMaps(),y).map(function(r){return[IM[r.i]+" "+y,r.fut?"Proyeksi":r.cur?"Bulan ini":"Realisasi",Math.round(r.c),Math.round(r.kv),Math.round(r.pv),Math.round(r.kv+r.pv)]})}
-function lamaRows(){return lamaList().map(function(o){var x=o.x;return[x.nama,x.ket||"",x.angs,x.bulan-x.sisa,x.bulan,x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0,x.sisa,x.angs*x.sisa,o.f?iso(o.f):"",x.modal>0?"Modal":fx(rate())+"% angsuran",Math.round(krProfit(x))]})}
+function lamaRows(){return lamaList().map(function(o){var x=o.x;return[x.nama,x.ket||"",x.angs,x.bulan-x.sisa,x.bulan,x.bulan?Math.round((x.bulan-x.sisa)/x.bulan*100):0,x.sisa,x.angs*x.sisa,o.f?iso(o.f):"",krMargin(x)!==null?Math.round(x.angs*krMargin(x)):"Belum ada modal",krMargin(x)!==null?Math.round(krMargin(x)*1000)/10:"",krMargin(x)!==null?Math.round(krProfit(x)):""]})}
 $("rkc").onclick=function(){csvOut("rekap-bulanan-"+$("ixy").value+".csv",RKH,rekapRows())};
-$("rkx").onclick=function(){xlsOut("rekap-keuntungan-"+iso(new Date())+".xlsx",[["Rekap "+$("ixy").value,RKH,rekapRows(),[2,3,4,5]],["Estimasi Selesai",LMH,lamaRows(),[2,7,10]]])};
+$("rkx").onclick=function(){xlsOut("rekap-keuntungan-"+iso(new Date())+".xlsx",[["Rekap "+$("ixy").value,RKH,rekapRows(),[2,3,4,5]],["Estimasi Selesai",LMH,lamaRows(),[2,7,9,11]]])};
 $("ixy").onchange=renderProfit;$("ixq").oninput=renderPd;
 function renderPd(){var q=$("ixq").value.toLowerCase(),rows=pd.filter(function(r){return!q||(r.barang||"").toLowerCase().indexOf(q)>=0}).sort(function(a,b){var x=a.tgl_payment||a.tgl_order||"",y=b.tgl_payment||b.tgl_order||"";return x<y?1:x>y?-1:0}),tm=0,tp=0,dd2=function(s){return s?fmD(new Date(s+"T00:00:00")):"-"};
 $("ixl").innerHTML=pdErr?'<tr><td class=em colspan=7>'+esc(pdErr)+'</td></tr>':rows.length?rows.map(function(r){var m=+r.modal||0,pf=+r.profit||0,id=+r.id;tm+=m;tp+=pf;
